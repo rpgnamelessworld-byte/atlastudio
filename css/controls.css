@@ -1,0 +1,290 @@
+/* Tipografia, espaçamento, foco e estados dos controles compartilhados.
+   Carregado após shared-components.css e antes de studio-interface.css.
+   Os seletores :where() permitem ajustes específicos por componente. */
+
+/* Variáveis de tipografia, espaçamento, bordas, sombras e movimento.
+   As cores dos componentes são definidas em studio-interface.css. */
+
+:root {
+  /* Fonte da interface e fonte dos títulos da marca. */
+  --font-ui: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  --font-display: Georgia, "Times New Roman", serif;
+
+  --text-sm: 13px;
+  --text-base: 14px;
+
+  /* Espaçamento em múltiplos de 4 px. */
+  --space-2: 8px;
+  --space-3: 12px;
+
+  /* Raios dos componentes, com valores de fallback. */
+  --radius-xs: var(--component-radius-xs, 5px);
+  --radius-sm: var(--component-radius-sm, 8px);
+  --radius-md: var(--component-radius-md, 12px);
+  --radius-pill: 999px;
+
+  /* Sombras dos componentes, com valores de fallback. */
+  --shadow-sm: var(--component-shadow-small, 0 6px 18px rgba(0, 0, 0, 0.28));
+  --shadow-lg: var(--component-shadow, 0 24px 60px rgba(0, 0, 0, 0.48));
+
+  /* Curva e duração das transições. */
+  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --dur-fast: 120ms;
+  --dur-base: 180ms;
+  --dur-slow: 260ms;
+
+  /* Cores semânticas e indicador de foco. */
+  --accent: var(--component-accent, var(--admin-accent, #5b57ff));
+  --accent-strong: var(--component-accent-strong, #7772ff);
+  --danger: var(--component-danger, var(--admin-red, #ef6b76));
+  --focus-ring: inset 0 0 0 1px color-mix(in srgb, var(--accent) 72%, transparent);
+}
+
+/* Tipografia e dimensionamento. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* A fonte definida no elemento raiz é herdada pelos controles.
+   Títulos podem definir sua própria família tipográfica. */
+html {
+  font-family: var(--font-ui) !important;
+  font-size: var(--text-base) !important;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-ui);
+  line-height: 1.45;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+/* Barras de rolagem. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ui-border, #303b44) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--ui-border, #303b44);
+  border-radius: var(--radius-pill);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Transições com baixa especificidade para permitir ajustes por componente. */
+
+:where(
+    button,
+    a,
+    input,
+    select,
+    textarea,
+    [class*="button" i],
+    [class*="btn" i],
+    [class*="tool" i],
+    [class*="tab" i],
+    [class*="chip" i]
+  ) {
+  transition: background-color var(--dur-base) var(--ease),
+    border-color var(--dur-base) var(--ease),
+    color var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease),
+    opacity var(--dur-base) var(--ease), transform var(--dur-fast) var(--ease);
+}
+
+:where(
+    button:not(:disabled),
+    a,
+    [class*="button" i]:not(:disabled),
+    [class*="btn" i]:not(:disabled)
+  ):active {
+  transform: translateY(1px);
+}
+
+/* Foco visível para navegação por teclado. */
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: none !important;
+  box-shadow: var(--focus-ring);
+}
+
+:where(
+    .danger,
+    .perigo,
+    .menu-danger,
+    .object-remove-action,
+    .action-danger
+  ):focus-visible {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--danger) 82%, transparent) !important;
+}
+
+/* Botões. */
+
+:where(button, [class*="button" i], [class*="btn" i]) {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--ui-border, #303b44);
+  background: var(--ui-panel-2, #161e25);
+  color: var(--ui-text, #e7edf2);
+}
+
+:where(button, [class*="button" i], [class*="btn" i]):not(:disabled):hover {
+  border-color: var(--accent);
+  background: var(--ui-panel-3, #1b242c);
+}
+
+/* Ações primárias e botões de salvamento. */
+:where([class*="primary" i], [class*="primaria" i], [class*="btn-save" i]) {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+}
+
+:where(
+    [class*="primary" i]:not(:disabled):hover,
+    [class*="primaria" i]:not(:disabled):hover
+  ) {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+}
+
+/* Ações destrutivas. */
+:where([class*="danger" i], [class*="perigo" i]) {
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  border-color: color-mix(in srgb, var(--danger) 45%, transparent);
+  color: var(--danger);
+}
+
+:where([class*="danger" i]:not(:disabled):hover, [class*="perigo" i]:not(:disabled):hover) {
+  background: var(--danger);
+  color: #1a0505;
+}
+
+/* Botões de ícone com proporção quadrada. */
+:where([class*="icon-only" i]) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  padding: 0;
+}
+
+/* Campos de formulário. */
+
+:where(input, select, textarea) {
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--ui-border, #303b44);
+  background: var(--ui-panel, #12191f);
+  color: var(--ui-text, #e7edf2);
+  padding: var(--space-2) var(--space-3);
+}
+
+:where(input, select, textarea):hover {
+  border-color: var(--ui-border-soft, #26323a);
+}
+
+:where(input, select, textarea):focus-visible {
+  border-color: var(--accent);
+}
+
+/* Painéis, diálogos e modais. */
+
+:where(
+    .painel,
+    .inspector,
+    .section-card,
+    .permission-card,
+    .visibility-map,
+    .map-card,
+    .admin-main,
+    .admin-sidebar,
+    .system-dialog,
+    .project-dialog,
+    .admin-dialog,
+    .object-search-dialog,
+    .modal-caixa
+  ) {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--ui-border, #303b44);
+  background: var(--ui-panel, #12191f);
+}
+
+:where(
+    .system-dialog,
+    .project-dialog,
+    .admin-dialog,
+    .object-search-dialog,
+    .modal-caixa
+  ) {
+  box-shadow: var(--shadow-lg);
+}
+
+:where(
+    .painel,
+    .inspector,
+    .section-card,
+    .permission-card,
+    .visibility-map,
+    .map-card,
+    .admin-main,
+    .admin-sidebar
+  ) {
+  box-shadow: var(--shadow-sm);
+}
+
+/* Abas e estado ativo. */
+
+:where([class*="tab" i]) {
+  border-radius: var(--radius-xs);
+  color: var(--ui-muted, #8c9aa5);
+}
+
+:where([class*="tab" i].active, [class*="tab" i].ativo) {
+  color: var(--ui-text, #e7edf2);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+/* Animação de abertura dos controles. O menu radial usa apenas opacidade. */
+
+:where([class~="aberto"]:not(.map-radial-menu), [class~="ativo"], [class~="show"]) {
+  animation: control-enter var(--dur-slow) var(--ease);
+}
+
+@keyframes control-enter {
+  from {
+    opacity: 0;
+    transform: translateY(2px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

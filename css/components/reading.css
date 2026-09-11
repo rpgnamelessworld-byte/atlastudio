@@ -1,0 +1,176 @@
+/* Popups do mapa */
+.consulta-popup-deslocado .leaflet-popup-tip-container { visibility: hidden; }
+.consulta-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 0 0 auto;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--studio-border);
+}
+.consulta-toolbar button {
+  flex: 1 1 125px;
+  min-width: 0;
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 1px solid var(--studio-border);
+  border-radius: 8px;
+  background: var(--studio-surface-subtle);
+  color: var(--studio-text);
+  line-height: 1.3;
+  cursor: pointer;
+}
+.consulta-toolbar button:hover { border-color: var(--studio-accent); }
+.atlas-reading-panel {
+  position: fixed;
+  z-index: 1100;
+  top: calc(var(--topbar-h, 64px) + 12px);
+  bottom: 42px;
+  right: 12px;
+  width: min(390px, calc(100vw - 24px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--studio-border);
+  border-radius: 12px;
+  background: var(--studio-surface);
+  color: var(--studio-text);
+  box-shadow: var(--studio-elevation-lg);
+}
+.atlas-reading-panel[hidden], .projects-visible .atlas-reading-panel { display: none; }
+.consulta-panel-heading { display: flex; flex: 0 0 auto; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--studio-border); }
+.consulta-panel-heading strong { font-size: 13px; }
+.consulta-panel-heading span { flex: 1; color: var(--studio-text-subtle); font-size: 10px; }
+.consulta-panel-heading button { flex: 0 0 36px; width: 36px; min-height: 36px; font-size: 22px; }
+#conteudoConsulta { flex: 1; min-height: 0; overflow: hidden; }
+#conteudoConsulta > .object-popup { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto minmax(0, 1fr); height: 100%; max-height: none; }
+#conteudoConsulta .object-popup-header { padding-right: 16px; }
+#conteudoConsulta .consulta-toolbar { position: static; align-items: center; padding: 8px; }
+#conteudoConsulta .object-popup-body { grid-column: 1 / -1; }
+#conteudoConsulta > p { margin: 16px; }
+.consulta-filtros { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 8px 0; }
+.consulta-filtros label:first-child { grid-column: 1 / -1; }
+.consulta-limpar { align-self: end; min-height: 36px; }
+.consulta-filtros label { display: grid; gap: 4px; font-size: 11px; color: var(--studio-text); }
+.consulta-filtros input, .consulta-filtros select { min-width: 0; width: 100%; min-height: 36px; font-size: 12px; }
+.consulta-contagem { font-size: 11px; margin: 8px 0; }
+.atlas-object-popup .object-popup { color: var(--studio-text); }
+.atlas-object-popup .regiao-titulo-secao { color: var(--studio-text-subtle); }
+.atlas-object-popup .object-popup-body > .regiao-conteudo:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+.consulta-resultados { display: grid; gap: 8px; }
+.consulta-item { min-width: 0; border: 1px solid var(--studio-border); border-radius: 8px; background: var(--studio-surface-subtle); overflow-wrap: anywhere; }
+.consulta-item .regiao-entidade { border: 0; margin: 0; background: transparent; }
+.consulta-item .regiao-entidade summary { padding: 9px; cursor: pointer; }
+.consulta-item .regiao-entidade summary::before { content: "▸"; }
+.consulta-item .regiao-entidade[open] summary::before { content: "▾"; }
+.consulta-item .regiao-detalhes { padding: 6px 10px 10px; }
+.consulta-item-acoes { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 4px 9px 9px; }
+.consulta-item-acoes span { font-size: 10px; color: var(--studio-text-subtle); }
+.consulta-item-acoes button { min-height: 32px; }
+.consulta-mais { width: 100%; margin-top: 10px; }
+.consulta-mais[hidden] { display: none; }
+.consulta-item button:focus-visible, .consulta-toolbar button:focus-visible, .atlas-reading-panel :is(button, input, select, summary):focus-visible { outline: 2px solid var(--studio-accent); outline-offset: -2px; }
+.atlas-object-popup .object-popup-header { min-height: 0; max-height: 130px; overflow: auto; }
+.atlas-reading-panel .object-popup-header { max-height: 100px; }
+.atlas-reading-panel .object-popup-eyebrow { display: none; }
+body.consulta-aberta .map-legend-trigger { right: 414px; }
+@media (max-width: 700px) {
+  .atlas-reading-panel { top: auto; bottom: var(--consulta-bottom, 34px); left: 8px; right: 8px; width: auto; height: min(calc(var(--consulta-viewport-height, 100dvh) * .52), 460px); }
+  body.consulta-aberta .map-legend-trigger { right: 8px; bottom: calc(var(--consulta-bottom, 34px) + min(calc(var(--consulta-viewport-height, 100dvh) * .52), 460px) + 8px); }
+  .consulta-panel-heading { padding: 7px 10px; }
+  .consulta-panel-heading button, .consulta-filtros :is(input, select), .consulta-item-acoes button, .consulta-mais, .consulta-limpar, .consulta-toolbar button { min-height: 44px; }
+  .consulta-item .regiao-entidade summary { min-height: 44px; }
+}
+.atlas-object-popup .leaflet-popup-content-wrapper,
+.atlas-object-popup .leaflet-popup-tip,
+html.tema-claro .atlas-object-popup .leaflet-popup-content-wrapper,
+html.tema-claro .atlas-object-popup .leaflet-popup-tip {
+  border-color: var(--studio-border) !important;
+  background: var(--studio-surface) !important;
+  color: var(--studio-text) !important;
+}
+
+.atlas-object-popup .leaflet-popup-content-wrapper {
+  overflow: hidden;
+  border: 1px solid var(--studio-border);
+  border-radius: var(--studio-radius-md);
+  box-shadow: var(--studio-elevation-lg);
+  max-height: var(--atlas-popup-height, calc(100dvh - 112px));
+}
+
+.atlas-object-popup .leaflet-popup-content,
+.atlas-object-popup .object-popup {
+  max-height: var(--atlas-popup-height, calc(100dvh - 114px));
+}
+
+.atlas-object-popup .leaflet-popup-content {
+  min-width: 0;
+  margin: 0;
+  /* Leaflet escreve width inline: esta é a única exceção necessária aqui. */
+  width: var(--atlas-popup-width, min(360px, calc(100vw - 48px))) !important;
+}
+
+.atlas-object-popup .object-popup {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.atlas-object-popup .object-popup-header {
+  flex: 0 0 auto;
+}
+
+.atlas-object-popup .object-popup-body {
+  min-height: 0;
+  max-height: none;
+  flex: 1 1 auto;
+  overscroll-behavior: contain;
+}
+
+.object-popup-portal-button {
+  width: 100%;
+  min-height: 40px;
+  padding: 10px 14px;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.object-popup-body:empty { display: none; }
+.object-popup-destination { overflow-wrap: anywhere; }
+.object-popup-link-button { min-height: 36px; gap: 8px; }
+.object-popup-link-button:focus-visible { outline: 2px solid var(--studio-accent); outline-offset: 2px; }
+#mapa .atlas-object-selected .marcador-icone {
+  outline: 2px solid currentColor;
+  outline-offset: 5px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--studio-surface) 75%, transparent);
+}
+#mapa path.atlas-object-selected { filter: drop-shadow(0 0 3px var(--studio-accent)); }
+.editor-vertex-wrap:has(.objeto-em-edicao) { width: 44px; height: 44px; }
+
+/* Formulários de conexão: uma superfície, sem fieldsets encaixados. */
+#formObjeto .line-relation-endpoint {
+  min-width: 0;
+  margin: 0;
+  padding: 12px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+#formObjeto .line-relation-endpoint + .line-relation-endpoint { border-top: 1px solid var(--studio-border); }
+#formObjeto .line-relation-endpoint legend { padding: 0; font-size: 11px; color: var(--studio-text-subtle); }
+#formObjeto .line-relation-endpoint .campo { margin: 8px 0; }
+.conexao-local { display: grid; gap: 8px; min-width: 0; }
+.conexao-local [hidden] { display: none; }
+.conexao-local :is(input, select, button) { min-width: 0; width: 100%; min-height: 36px; }
+.conexao-coordenadas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.conexao-coordenadas label { display: grid; gap: 4px; }
+.conexao-escolhendo { outline: 2px solid var(--studio-accent); outline-offset: 3px; }
+@media (max-width: 700px) {
+  .conexao-local :is(input, select, button), .object-popup-link-button { min-height: 44px; }
+}
+
+.object-popup-portal-button:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+}

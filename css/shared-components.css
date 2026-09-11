@@ -1,0 +1,1471 @@
+/* Componentes compartilhados: navegação, biblioteca, diálogos e Administração.
+   Define variáveis de superfície e estados dos componentes nos dois temas. */
+
+:root {
+  color-scheme: dark;
+  --component-ink-0: #0b121c;
+  --component-ink-1: #0d1622;
+  --component-ink-2: #101a28;
+  --component-ink-3: #131f30;
+  --component-ink-4: #1a2636;
+  --component-line: #223247;
+  --component-line-soft: rgba(143, 160, 181, .14);
+  --component-paper: #f3f4f8;
+  --component-text: #e9edf3;
+  --component-muted: #8fa0b5;
+  --component-faint: #5c7086;
+  --component-accent: #7772ff;
+  --component-accent-strong: #9793ff;
+  --component-accent-soft: rgba(119, 114, 255, .14);
+  --component-teal: #4fc3ad;
+  --component-teal-soft: rgba(79, 195, 173, .11);
+  --component-danger: #d9646b;
+  --component-danger-soft: rgba(217, 100, 107, .12);
+  --component-radius-xs: 5px;
+  --component-radius-sm: 8px;
+  --component-radius-md: 12px;
+  --component-radius-lg: 18px;
+  --component-shadow: 0 24px 70px rgba(0, 0, 0, .5);
+  --component-shadow-small: 0 10px 30px rgba(0, 0, 0, .28);
+
+  --atlas-bg: var(--component-ink-1);
+  --atlas-bg-deep: var(--component-ink-0);
+  --atlas-surface: var(--component-ink-2);
+  --atlas-surface-2: var(--component-ink-3);
+  --atlas-surface-3: var(--component-ink-4);
+  --atlas-border: var(--component-line);
+  --atlas-border-soft: var(--component-line-soft);
+  --atlas-text: var(--component-text);
+  --atlas-muted: var(--component-muted);
+  --atlas-faint: var(--component-faint);
+  --atlas-gold: var(--component-accent);
+  --atlas-gold-strong: var(--component-accent-strong);
+  --atlas-gold-soft: var(--component-accent-soft);
+  --atlas-danger: var(--component-danger);
+  --ui-bg: var(--component-ink-1);
+  --ui-panel: var(--component-ink-2);
+  --ui-panel-2: var(--component-ink-3);
+  --ui-panel-3: var(--component-ink-4);
+  --ui-border: var(--component-line);
+  --ui-border-soft: var(--component-line-soft);
+  --ui-text: var(--component-text);
+  --ui-muted: var(--component-muted);
+  --inspector-accent: var(--component-accent);
+  --inspector-border: var(--component-line);
+  --map-canvas-bg: var(--component-ink-0);
+  --admin-bg: var(--component-ink-1);
+  --admin-panel: var(--component-ink-2);
+  --admin-panel-2: var(--component-ink-3);
+  --admin-border: var(--component-line);
+  --admin-border-soft: var(--component-line-soft);
+  --admin-text: var(--component-text);
+  --admin-muted: var(--component-muted);
+  --admin-faint: var(--component-faint);
+  --admin-accent: var(--component-accent);
+  --admin-accent-soft: var(--component-accent-soft);
+  --admin-green: var(--component-teal);
+  --admin-green-soft: var(--component-teal-soft);
+  --admin-red: var(--component-danger);
+  --admin-red-soft: var(--component-danger-soft);
+  --admin-purple: #ad91db;
+  --admin-purple-soft: rgba(173, 145, 219, .12);
+  --admin-shadow: var(--component-shadow);
+  --admin-radius: var(--component-radius-sm);
+}
+
+:root.tema-claro {
+  color-scheme: light;
+  --component-ink-0: #f3f3f7;
+  --component-ink-1: #f6f6f9;
+  --component-ink-2: #ffffff;
+  --component-ink-3: #fbfbfd;
+  --component-ink-4: #f0f0f6;
+  --component-line: #e2e2eb;
+  --component-line-soft: rgba(51, 51, 76, .1);
+  --component-paper: #16161d;
+  --component-text: #16161d;
+  --component-muted: #696979;
+  --component-faint: #a1a1b0;
+  --component-accent: #5b57ff;
+  --component-accent-strong: #4642d6;
+  --component-accent-soft: #efeeff;
+  --component-teal: #12a878;
+  --component-teal-soft: #e6f7f1;
+  --component-danger: #e5484d;
+  --component-danger-soft: #fdeceb;
+  --component-shadow: 0 18px 46px rgba(20, 20, 30, .14);
+  --component-shadow-small: 0 6px 20px rgba(20, 20, 30, .08);
+  --admin-purple: #7255bd;
+  --admin-purple-soft: rgba(114, 85, 189, .1);
+}
+
+html,
+body,
+body.app-shell,
+.admin-shell {
+  background: var(--component-ink-1);
+  color: var(--component-text);
+  font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  transition: color .15s ease, background-color .15s ease, border-color .15s ease,
+    box-shadow .15s ease, transform .15s ease;
+}
+
+:focus-visible {
+  outline: none !important;
+}
+
+/* Barra de navegação superior. */
+.topbar,
+.admin-topbar {
+  border-bottom: 1px solid var(--component-line);
+  background: var(--component-ink-1);
+  box-shadow: 0 5px 22px rgba(0, 0, 0, .2);
+}
+
+.topbar::after,
+.admin-topbar::after {
+  content: none;
+}
+
+.brand-title,
+.admin-brand,
+.projects-heading h1,
+.project-dialog h2,
+.projects-empty h2,
+.admin-person h1,
+.admin-dialog h2 {
+  color: var(--component-paper);
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 500;
+  letter-spacing: .025em;
+  text-transform: none;
+}
+
+.brand-mark,
+.admin-brand-mark {
+  color: var(--component-accent);
+}
+
+#buscaMapa,
+.project-top-search,
+.project-mobile-search,
+.admin-search,
+.campo input,
+.campo select,
+.campo textarea,
+.grupo-opcoes input,
+.grupo-opcoes select,
+.project-dialog input,
+.project-dialog textarea,
+.admin-field input,
+.admin-field select {
+  border: 1px solid var(--component-line) !important;
+  border-radius: var(--component-radius-sm);
+  background: var(--component-ink-0) !important;
+  color: var(--component-text) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025);
+}
+
+#buscaMapa:focus,
+.project-top-search:focus-within,
+.project-mobile-search:focus-within,
+.admin-search:focus-within,
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus,
+.project-dialog input:focus,
+.project-dialog textarea:focus,
+.admin-field input:focus,
+.admin-field select:focus {
+  border-color: var(--component-accent) !important;
+  box-shadow: 0 0 0 3px var(--component-accent-soft) !important;
+}
+
+.top-button,
+.top-mode-switch button,
+.main-menu-trigger,
+.admin-icon-button,
+.admin-back {
+  border-color: var(--component-line);
+  border-radius: var(--component-radius-sm);
+  background: var(--component-ink-2);
+  color: var(--component-muted);
+}
+
+.top-button:hover,
+.top-mode-switch button:hover,
+.top-mode-switch button.ativo,
+.admin-icon-button:hover,
+.admin-back:hover {
+  border-color: var(--component-faint);
+  background: var(--component-ink-3);
+  color: var(--component-text);
+}
+
+.main-menu-trigger[aria-expanded="true"] {
+  border-color: var(--component-accent) !important;
+  background: var(--component-accent-soft) !important;
+  color: var(--component-accent-strong) !important;
+}
+
+/* Menu principal: grupos em blocos, ações comuns neutras. */
+.main-command-menu {
+  width: 310px;
+  padding: 8px;
+  border: 1px solid var(--component-line);
+  border-radius: var(--component-radius-lg);
+  background: color-mix(in srgb, var(--component-ink-1) 96%, transparent);
+  box-shadow: var(--component-shadow);
+  backdrop-filter: blur(20px) saturate(120%);
+}
+
+.main-command-menu::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 25px;
+  width: 58px;
+  height: 2px;
+  background: var(--component-accent);
+}
+
+.main-command-group {
+  gap: 3px;
+  margin-top: 5px;
+  padding: 8px;
+  border: 1px solid var(--component-line-soft);
+  border-radius: var(--component-radius-md);
+  background: rgba(255, 255, 255, .018);
+}
+
+.main-command-group:first-child {
+  margin-top: 0;
+  padding-top: 8px;
+  border: 1px solid var(--component-line-soft);
+}
+
+.main-command-group-title {
+  padding: 2px 7px 6px;
+  color: var(--component-faint);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .16em;
+}
+
+.menu-command {
+  min-height: 39px;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  padding: 5px 8px;
+  border-radius: var(--component-radius-sm);
+  color: var(--component-muted);
+}
+
+.menu-command-icon,
+.menu-command.menu-primary:not(:disabled) .menu-command-icon {
+  color: var(--component-faint);
+}
+
+.menu-command:hover:not(:disabled),
+.menu-command:focus-visible {
+  border-color: var(--component-line);
+  background: var(--component-ink-3);
+  color: var(--component-text);
+  transform: translateX(2px);
+}
+
+.menu-command:hover:not(:disabled) .menu-command-icon {
+  color: var(--component-text);
+}
+
+.menu-command-shortcut {
+  border: 1px solid var(--component-line-soft);
+  border-radius: 4px;
+  background: var(--component-ink-0);
+  color: var(--component-faint);
+}
+
+/* Criar mapa usa apenas tipografia de destaque, como a ação de exclusão. */
+#novoMapa {
+  border-color: transparent;
+  background: transparent;
+  color: var(--component-accent) !important;
+}
+
+#novoMapa .menu-command-icon {
+  color: var(--component-accent) !important;
+}
+
+#novoMapa:hover,
+#novoMapa:focus-visible {
+  border-color: var(--component-line);
+  background: var(--component-ink-3);
+  color: var(--component-accent-strong) !important;
+}
+
+#novoMapa:hover .menu-command-icon,
+#novoMapa:focus-visible .menu-command-icon {
+  color: var(--component-accent-strong) !important;
+}
+
+/* Diálogos de sistema internos. */
+.system-dialog {
+  width: min(460px, calc(100vw - 28px));
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--component-line);
+  border-radius: var(--component-radius-lg);
+  background: var(--component-ink-2);
+  color: var(--component-text);
+  box-shadow: var(--component-shadow);
+}
+
+.system-dialog::backdrop {
+  background: rgba(3, 7, 10, .74);
+  backdrop-filter: blur(4px);
+}
+
+.system-dialog-form {
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+}
+
+.system-dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.system-dialog-mark {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--component-accent) 38%, var(--component-line));
+  border-radius: 50%;
+  background: var(--component-accent-soft);
+  color: var(--component-accent);
+}
+
+.system-dialog-mark svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+}
+
+.system-dialog-eyebrow {
+  margin: 0 0 3px;
+  color: var(--component-faint);
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.system-dialog h2 {
+  margin: 0;
+  color: var(--component-text);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.system-dialog-message {
+  margin: -5px 0 0;
+  color: var(--component-muted);
+  font-size: 13px;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+.system-dialog-field {
+  display: grid;
+  gap: 7px;
+  color: var(--component-muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.system-dialog-field input {
+  width: 100%;
+  height: 40px;
+  box-sizing: border-box;
+  padding: 0 11px;
+  border: 1px solid var(--component-line);
+  border-radius: var(--component-radius-sm);
+  outline: 0;
+  background: var(--component-ink-1);
+  color: var(--component-text);
+}
+
+.system-dialog-field input:focus {
+  border-color: var(--component-accent);
+  box-shadow: 0 0 0 2px var(--component-accent-soft);
+}
+
+.system-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  padding-top: 2px;
+}
+
+.system-dialog-actions button {
+  min-height: 38px;
+  padding: 0 15px;
+  border: 1px solid var(--component-line);
+  border-radius: var(--component-radius-sm);
+  background: var(--component-ink-3);
+  color: var(--component-muted);
+  font-weight: 700;
+}
+
+.system-dialog-actions button:hover,
+.system-dialog-actions button:focus-visible {
+  border-color: var(--component-faint);
+  color: var(--component-text);
+}
+
+.system-dialog-confirm {
+  border-color: color-mix(in srgb, var(--component-accent) 55%, var(--component-line)) !important;
+  background: var(--component-accent-soft) !important;
+  color: var(--component-accent-strong) !important;
+}
+
+.system-dialog-confirm.danger {
+  border-color: color-mix(in srgb, var(--component-danger) 55%, var(--component-line)) !important;
+  background: var(--component-danger-soft) !important;
+  color: var(--component-danger) !important;
+}
+
+@media (max-width: 460px) {
+  .system-dialog-form {
+    gap: 16px;
+    padding: 18px;
+  }
+
+  .system-dialog-actions button {
+    flex: 1;
+  }
+}
+
+#excluirMapa,
+#excluirMapa .menu-command-icon {
+  color: var(--component-danger) !important;
+}
+
+#excluirMapa:hover,
+#excluirMapa:focus-visible {
+  border-color: rgba(237, 111, 114, .4);
+  background: var(--component-danger-soft);
+}
+
+/* Biblioteca de projetos. */
+.projects-view {
+  background:
+    linear-gradient(rgba(136, 158, 171, .035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(136, 158, 171, .035) 1px, transparent 1px),
+    radial-gradient(circle at 78% 5%, var(--component-teal-soft), transparent 31%),
+    var(--component-ink-1);
+  background-size: 32px 32px, 32px 32px, auto, auto;
+}
+
+.projects-shell {
+  width: min(1180px, calc(100% - 48px));
+  padding-top: 54px;
+}
+
+.projects-heading {
+  align-items: center;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--component-line);
+}
+
+.projects-eyebrow,
+.admin-eyebrow {
+  color: var(--component-teal);
+  letter-spacing: .18em;
+}
+
+.projects-heading h1 {
+  font-size: clamp(30px, 3vw, 42px);
+}
+
+.atlas-primary-button,
+.dialog-primary {
+  min-height: 42px;
+  padding-inline: 18px;
+  border: 1px solid var(--component-accent);
+  border-radius: var(--component-radius-sm);
+  background: var(--component-accent);
+  color: #ffffff;
+  box-shadow: 0 8px 22px rgba(91, 87, 255, .16);
+}
+
+.atlas-primary-button:hover,
+.dialog-primary:hover {
+  border-color: var(--component-accent-strong);
+  background: var(--component-accent-strong);
+  transform: translateY(-1px);
+}
+
+.projects-grid {
+  gap: 18px;
+}
+
+.project-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--component-line);
+  border-radius: var(--component-radius-md);
+  background: var(--component-ink-2);
+  box-shadow: var(--component-shadow-small);
+}
+
+.project-card::before {
+  content: none;
+}
+
+.project-card:hover {
+  border-color: color-mix(in srgb, var(--component-teal) 48%, var(--component-line));
+  transform: translateY(-3px);
+}
+
+.project-card-icon {
+  border-color: rgba(98, 193, 182, .3);
+  border-radius: 50%;
+  background: var(--component-teal-soft);
+  color: var(--component-teal);
+}
+
+.project-card-stats,
+.project-card-actions {
+  border-color: var(--component-line-soft);
+  background: rgba(0, 0, 0, .08);
+}
+
+.project-card-actions button:hover {
+  border-color: var(--component-line);
+  background: var(--component-ink-3);
+}
+
+.projects-empty {
+  border: 1px dashed var(--component-line);
+  border-radius: var(--component-radius-lg);
+  background: rgba(255, 255, 255, .018);
+}
+
+.projects-empty > svg {
+  stroke: var(--component-teal);
+}
+
+.project-dialog,
+.admin-dialog {
+  border: 1px solid var(--component-line);
+  border-radius: var(--component-radius-lg);
+  background: var(--component-ink-2);
+  color: var(--component-text);
+  box-shadow: var(--component-shadow);
+}
+
+.project-dialog::backdrop,
+.admin-dialog::backdrop {
+  background: rgba(3, 6, 9, .76);
+  backdrop-filter: blur(7px);
+}
+
+.project-dialog header,
+.admin-dialog header {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--component-line-soft);
+}
+
+.project-dialog-close,
+.dialog-close,
+.object-search-close,
+.fechar {
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--component-faint);
+}
+
+.project-dialog-close:hover,
+.dialog-close:hover,
+.object-search-close:hover,
+.fechar:hover {
+  border-color: rgba(237, 111, 114, .32);
+  background: var(--component-danger-soft);
+  color: var(--component-danger);
+}
+
+#painel.inspector {
+  --inspector-gutter: 10px;
+  --inspector-card-gap: 18px;
+  overflow: hidden;
+  border: 1px solid var(--component-line) !important;
+  border-radius: var(--component-radius-lg) !important;
+  background: color-mix(in srgb, var(--component-ink-1) 97%, transparent) !important;
+  box-shadow: var(--component-shadow) !important;
+  backdrop-filter: blur(18px);
+}
+
+#painel .inspector-titlebar {
+  min-height: 48px;
+  padding-inline: var(--inspector-gutter) !important;
+  border-bottom: 1px solid var(--component-line);
+  background: var(--component-ink-2);
+}
+
+#painel #painelEdicao {
+  padding: 0 !important;
+}
+
+#painel .inspector-scroll {
+  padding: var(--inspector-gutter) !important;
+}
+
+#painel .inspector-actionbar {
+  padding: 7px var(--inspector-gutter) !important;
+}
+
+#painel .clean-details {
+  margin-bottom: var(--inspector-card-gap);
+}
+
+#painel .type-creation-list,
+#painel .inspector-layers-list,
+#painel .branch-list {
+  gap: 12px !important;
+}
+
+#painel .layer-group + .layer-group {
+  margin-top: 12px;
+}
+
+#painel .object-summary-actions {
+  gap: 10px;
+}
+
+#painel .inspector-titlebar::before {
+  content: "";
+  width: 3px;
+  height: 20px;
+  margin-right: 7px;
+  border-radius: 9px;
+  background: var(--component-accent);
+}
+
+.inspector-mode-switch button,
+.inspector-tab {
+  border-radius: var(--component-radius-xs);
+  color: var(--component-faint);
+}
+
+.inspector-mode-switch button.ativo,
+.inspector-tab.ativo {
+  border-color: rgba(91, 87, 255, .38);
+  background: var(--component-accent-soft);
+  color: var(--component-accent-strong);
+}
+
+.inspector-section,
+#painelEdicao {
+  scrollbar-color: var(--component-line) transparent;
+}
+
+.section-card,
+.clean-details,
+.layer-group,
+.branch-row,
+.grupo-referencia,
+.controle-vertice,
+.grupo-opcoes,
+.lista-relacoes,
+.object-field-picker,
+.coordinate-scale-summary {
+  border: 1px solid var(--component-line-soft) !important;
+  border-radius: var(--component-radius-md) !important;
+  background: var(--component-ink-2) !important;
+}
+
+.section-card-title,
+.clean-details > summary {
+  color: var(--component-text);
+  letter-spacing: .01em;
+}
+
+.texto-ajuda,
+.campo small,
+.campo label,
+.empty-editor p,
+.field-helper {
+  color: var(--component-muted);
+}
+
+.empty-editor,
+.types-empty-state {
+  border: 1px dashed var(--component-line);
+  border-radius: var(--component-radius-md);
+  background: linear-gradient(145deg, var(--component-ink-2), var(--component-ink-1));
+}
+
+.empty-editor-icon {
+  border: 1px solid rgba(98, 193, 182, .28);
+  border-radius: 50%;
+  background: var(--component-teal-soft);
+  color: var(--component-teal);
+}
+
+.destaque,
+.primary-wide,
+.mini-botao.destaque,
+.inspector-action-button.action-save:not(:disabled) {
+  border-color: rgba(91, 87, 255, .45) !important;
+  border-radius: var(--component-radius-sm) !important;
+  background: var(--component-accent-soft) !important;
+  color: var(--component-accent-strong) !important;
+}
+
+.perigo,
+.object-remove-action,
+.inspector-action-button.action-danger:not(:disabled) {
+  border-color: rgba(237, 111, 114, .25) !important;
+  background: var(--component-danger-soft) !important;
+  color: var(--component-danger) !important;
+}
+
+.type-create-main,
+.type-edit-action,
+.type-new-action,
+.segmented-control button,
+.inspector-action-button,
+.object-summary-actions button,
+.acoes button,
+.controle-vertice button,
+.coordinate-calibration-actions button {
+  border-color: var(--component-line) !important;
+  border-radius: var(--component-radius-sm) !important;
+  background: var(--component-ink-3) !important;
+  color: var(--component-muted) !important;
+}
+
+.type-create-main:hover,
+.type-edit-action:hover,
+.type-new-action:hover,
+.object-summary-actions button:hover,
+.acoes button:hover {
+  border-color: var(--component-faint) !important;
+  color: var(--component-text) !important;
+}
+
+.object-summary-actions .object-remove-action {
+  border-color: color-mix(in srgb, var(--component-danger) 48%, var(--component-line)) !important;
+  background: transparent !important;
+  color: var(--component-danger) !important;
+}
+
+.object-summary-actions .object-remove-action:hover,
+.object-summary-actions .object-remove-action:focus-visible {
+  border-color: color-mix(in srgb, var(--component-danger) 68%, var(--component-line)) !important;
+  background: var(--component-danger-soft) !important;
+  color: var(--component-danger) !important;
+}
+
+/* Busca, popovers e caixas informativas. */
+.object-search-overlay {
+  background: rgba(3, 6, 9, .7);
+  backdrop-filter: blur(8px);
+}
+
+.object-search-dialog,
+.map-search-list,
+.quick-create-bar,
+.quick-create-popover,
+.map-legend-trigger,
+.toast {
+  border: 1px solid var(--component-line);
+  border-radius: var(--component-radius-md);
+  background: color-mix(in srgb, var(--component-ink-1) 97%, transparent);
+  color: var(--component-text);
+  box-shadow: var(--component-shadow-small);
+  backdrop-filter: blur(16px);
+}
+
+.object-search-dialog {
+  overflow: hidden;
+  border-radius: var(--component-radius-lg);
+}
+
+.object-search-header,
+.object-search-footer {
+  border-color: var(--component-line-soft);
+  background: var(--component-ink-2);
+}
+
+.object-search-symbol {
+  color: var(--component-teal);
+}
+
+#buscaObjetosInput {
+  color: var(--component-text);
+}
+
+.map-search-option,
+.object-search-result {
+  border-radius: var(--component-radius-sm);
+  color: var(--component-muted);
+}
+
+.map-search-option:hover,
+.map-search-option:focus-visible,
+.object-search-result:hover,
+.object-search-result:focus-visible,
+.object-search-result.ativo,
+.object-search-result[aria-selected="true"] {
+  background: var(--component-teal-soft);
+  color: var(--component-text);
+}
+
+.object-search-result-icon {
+  border-radius: 50%;
+  background: var(--component-teal-soft);
+  color: var(--component-teal);
+}
+
+.texto-ajuda,
+.status,
+.admin-panel-intro,
+.dialog-help,
+.integration-notice {
+  border-radius: var(--component-radius-sm);
+}
+
+.status,
+.dialog-help {
+  border: 1px solid rgba(114, 168, 222, .22);
+  background: rgba(114, 168, 222, .08);
+}
+
+.map-context-chip {
+  border: 1px solid rgba(98, 193, 182, .35);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--component-ink-1) 92%, transparent);
+  color: var(--component-teal);
+  box-shadow: var(--component-shadow-small);
+}
+
+.quick-create-type,
+.quick-create-choice,
+.quick-create-action {
+  border-radius: var(--component-radius-sm);
+}
+
+.quick-create-type:hover,
+.quick-create-choice:hover,
+.quick-create-action:hover,
+.quick-create-type.ativo,
+.quick-create-choice.ativo {
+  border-color: rgba(98, 193, 182, .38);
+  background: var(--component-teal-soft);
+  color: var(--component-teal);
+}
+
+/* Popups e informação sobre objetos. */
+.atlas-object-popup .leaflet-popup-content-wrapper,
+.atlas-object-popup .leaflet-popup-tip,
+.leaflet-tooltip.portal-route-tooltip {
+  border-color: var(--component-line);
+  background: var(--component-ink-2);
+  color: var(--component-text);
+}
+
+
+.object-popup-header {
+  border-bottom: 1px solid var(--component-line-soft);
+  background: linear-gradient(90deg, var(--component-teal-soft), transparent);
+}
+
+.object-popup-eyebrow,
+.object-popup-section-title {
+  color: var(--component-teal);
+}
+
+.object-popup-data-card {
+  border: 1px solid var(--component-line-soft);
+  border-radius: var(--component-radius-sm);
+  background: var(--component-ink-1);
+}
+
+.object-popup-link-button {
+  border-radius: var(--component-radius-sm);
+  background: var(--component-teal-soft);
+  color: var(--component-teal);
+}
+
+.leaflet-bar a,
+.leaflet-control-zoom a {
+  border-color: var(--component-line) !important;
+  background: var(--component-ink-2) !important;
+  color: var(--component-text) !important;
+}
+
+.leaflet-bar a:hover,
+.leaflet-control-zoom a:hover {
+  background: var(--component-ink-3) !important;
+  color: var(--component-accent) !important;
+}
+
+.statusbar,
+.admin-statusbar {
+  border-color: var(--component-line);
+  background: var(--component-ink-1);
+  color: var(--component-faint);
+}
+
+.statusbar strong,
+.admin-statusbar b {
+  color: var(--component-teal);
+}
+
+/* Componentes de Administração. */
+.admin-sidebar {
+  border-right: 1px solid var(--component-line);
+  background: var(--component-ink-2);
+}
+
+.integration-notice {
+  margin: 10px 14px 0;
+  border: 1px solid rgba(98, 193, 182, .22);
+  background: var(--component-teal-soft);
+}
+
+.integration-notice svg {
+  color: var(--component-teal);
+}
+
+.source-chip,
+.profile-badge,
+.profile-status {
+  border-radius: 999px;
+}
+
+.source-chip {
+  border-color: rgba(98, 193, 182, .25);
+  background: var(--component-teal-soft);
+  color: var(--component-teal);
+}
+
+.admin-user-list {
+  padding: 8px;
+}
+
+.admin-user-item {
+  margin-bottom: 5px;
+  border: 1px solid transparent;
+  border-radius: var(--component-radius-md);
+}
+
+.admin-user-item:hover {
+  border-color: var(--component-line-soft);
+  background: var(--component-ink-3);
+}
+
+.admin-user-item.active {
+  border-color: rgba(91, 87, 255, .34);
+  background: var(--component-ink-3);
+}
+
+.admin-avatar {
+  border: 1px solid var(--component-line);
+  border-radius: 50%;
+  background: var(--component-ink-4);
+  color: var(--component-muted);
+}
+
+.admin-user-item.active .admin-avatar,
+.admin-avatar.large {
+  border-color: rgba(91, 87, 255, .35);
+  background: var(--component-accent-soft);
+  color: var(--component-accent-strong);
+}
+
+.admin-add-button,
+.admin-save-button {
+  border: 1px solid rgba(91, 87, 255, .42);
+  border-radius: var(--component-radius-sm);
+  background: var(--component-accent-soft);
+  color: var(--component-accent-strong);
+}
+
+.admin-add-button:hover,
+.admin-save-button:hover:not(:disabled) {
+  border-color: var(--component-accent);
+  background: var(--component-accent);
+  color: #ffffff;
+}
+
+.admin-main {
+  background:
+    linear-gradient(rgba(136, 158, 171, .028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(136, 158, 171, .028) 1px, transparent 1px),
+    var(--component-ink-1);
+  background-size: 28px 28px;
+}
+
+.admin-main-head {
+  border-bottom: 1px solid var(--component-line);
+  background: color-mix(in srgb, var(--component-ink-1) 94%, transparent);
+}
+
+.profile-group {
+  padding: 4px;
+  border: 1px solid var(--component-line-soft);
+  border-radius: var(--component-radius-sm);
+  background: var(--component-ink-2);
+}
+
+.profile-button,
+.admin-delete-button,
+.admin-refresh-button,
+.dialog-secondary {
+  border-color: var(--component-line);
+  border-radius: var(--component-radius-sm);
+  background: var(--component-ink-3);
+  color: var(--component-muted);
+}
+
+.profile-button:hover,
+.admin-refresh-button:hover:not(:disabled),
+.dialog-secondary:hover {
+  border-color: var(--component-faint);
+  color: var(--component-text);
+}
+
+.admin-delete-button {
+  border-color: rgba(237, 111, 114, .24);
+  background: var(--component-danger-soft);
+  color: var(--component-danger);
+}
+
+.admin-tabs {
+  gap: 5px;
+  padding: 8px 16px 0;
+  border-bottom-color: var(--component-line);
+  background: var(--component-ink-2);
+}
+
+.admin-tab {
+  padding: 10px 13px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: var(--component-radius-sm) var(--component-radius-sm) 0 0;
+  color: var(--component-muted);
+}
+
+.admin-tab:hover {
+  background: var(--component-ink-3);
+  color: var(--component-text);
+}
+
+.admin-tab.active {
+  border-color: var(--component-line);
+  background: var(--component-ink-1);
+  color: var(--component-accent-strong);
+}
+
+.admin-content {
+  padding: 22px;
+}
+
+.permission-card,
+.visibility-map,
+.map-card {
+  overflow: hidden;
+  border: 1px solid var(--component-line);
+  border-radius: var(--component-radius-md);
+  background: var(--component-ink-2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .1);
+}
+
+.permission-row,
+.visibility-category-row,
+.visibility-object-row {
+  border-color: var(--component-line-soft);
+}
+
+.permission-row:hover,
+.visibility-category-row:hover,
+.visibility-object-row:hover {
+  background: rgba(255, 255, 255, .025);
+}
+
+.permission-dot {
+  background: var(--component-faint);
+}
+
+.permission-row.on .permission-dot {
+  background: var(--component-teal);
+  box-shadow: 0 0 0 4px var(--component-teal-soft);
+}
+
+.admin-switch {
+  border: 1px solid var(--component-line);
+  background: var(--component-ink-4);
+}
+
+.admin-switch::after {
+  background: var(--component-muted);
+}
+
+.admin-switch.on {
+  border-color: var(--component-teal);
+  background: var(--component-teal-soft);
+}
+
+.admin-switch.on::after {
+  background: var(--component-teal);
+}
+
+.map-card:hover {
+  border-color: var(--component-faint);
+  background: var(--component-ink-3);
+}
+
+.map-card.on {
+  border-color: rgba(98, 193, 182, .42);
+  background: var(--component-teal-soft);
+}
+
+.map-card-icon,
+.map-card.on .map-card-icon {
+  border-radius: 50%;
+  background: var(--component-teal-soft);
+  color: var(--component-teal);
+}
+
+.admin-toast {
+  border: 1px solid var(--component-line);
+  border-radius: var(--component-radius-md);
+  background: var(--component-ink-2);
+  color: var(--component-text);
+  box-shadow: var(--component-shadow-small);
+}
+
+.admin-toast.error {
+  border-color: rgba(237, 111, 114, .4);
+  background: color-mix(in srgb, var(--component-ink-2) 88%, var(--component-danger));
+}
+
+/* Superfícies e contraste do tema claro. */
+html.tema-claro,
+html.tema-claro body,
+html.tema-claro body.app-shell {
+  --ui-bg: var(--component-ink-1);
+  --ui-panel: var(--component-ink-2);
+  --ui-panel-2: var(--component-ink-3);
+  --ui-panel-3: var(--component-ink-4);
+  --ui-border: var(--component-line);
+  --ui-border-soft: var(--component-line-soft);
+  --ui-text: var(--component-text);
+  --ui-muted: var(--component-muted);
+  --inspector-border: var(--component-line);
+  --map-canvas-bg: var(--component-ink-0);
+  background: var(--component-ink-1);
+  color: var(--component-text);
+}
+
+html.tema-claro .topbar,
+html.tema-claro .admin-topbar {
+  border-color: var(--component-line);
+  background: var(--component-ink-2);
+  box-shadow: var(--component-shadow-small);
+}
+
+html.tema-claro .brand-mark,
+html.tema-claro .admin-brand-mark {
+  color: var(--component-accent);
+}
+
+html.tema-claro .brand-title,
+html.tema-claro .admin-brand {
+  color: var(--component-paper);
+}
+
+html.tema-claro .top-button,
+html.tema-claro .top-mode-switch button,
+html.tema-claro .inspector-mode-switch button {
+  border-color: var(--component-line) !important;
+  background: var(--component-ink-2) !important;
+  color: var(--component-muted) !important;
+  box-shadow: none;
+}
+
+html.tema-claro .top-button:hover,
+html.tema-claro .top-mode-switch button:hover,
+html.tema-claro .inspector-mode-switch button:hover:not(:disabled) {
+  border-color: var(--component-faint) !important;
+  background: var(--component-ink-3) !important;
+  color: var(--component-text) !important;
+}
+
+html.tema-claro .top-mode-switch button.ativo,
+html.tema-claro .inspector-mode-switch button.ativo {
+  border-color: color-mix(in srgb, var(--component-accent) 45%, var(--component-line)) !important;
+  background: var(--component-accent-soft) !important;
+  color: var(--component-accent) !important;
+}
+
+html.tema-claro #buscaMapa,
+html.tema-claro .map-list-button,
+html.tema-claro .map-search-list,
+html.tema-claro .main-command-menu,
+html.tema-claro .object-search-dialog,
+html.tema-claro .quick-create-bar,
+html.tema-claro .quick-create-popover,
+html.tema-claro .map-legend-trigger {
+  border-color: var(--component-line);
+  background: var(--component-ink-2);
+  color: var(--component-text);
+}
+
+html.tema-claro .menu-command,
+html.tema-claro .map-search-option,
+html.tema-claro .object-search-result {
+  color: var(--component-muted);
+}
+
+html.tema-claro .menu-command:hover:not(:disabled),
+html.tema-claro .menu-command:focus-visible,
+html.tema-claro .map-search-option:hover,
+html.tema-claro .map-search-option:focus-visible,
+html.tema-claro .object-search-result:hover,
+html.tema-claro .object-search-result:focus-visible,
+html.tema-claro .object-search-result.ativo {
+  border-color: var(--component-line);
+  background: var(--component-teal-soft);
+  color: var(--component-text);
+}
+
+html.tema-claro .atlas-primary-button,
+html.tema-claro .dialog-primary,
+html.tema-claro .system-dialog-confirm:not(.danger) {
+  border-color: var(--component-accent) !important;
+  background: var(--component-accent) !important;
+  color: var(--component-ink-2) !important;
+}
+
+html.tema-claro .atlas-primary-button:hover,
+html.tema-claro .dialog-primary:hover,
+html.tema-claro .system-dialog-confirm:not(.danger):hover {
+  border-color: var(--component-accent-strong) !important;
+  background: var(--component-accent-strong) !important;
+  color: var(--component-ink-2) !important;
+}
+
+html.tema-claro .map-stage,
+html.tema-claro #mapa,
+html.tema-claro .leaflet-container {
+  background: var(--component-ink-0) !important;
+}
+
+html.tema-claro #painel.inspector {
+  border-color: var(--component-line) !important;
+  background: color-mix(in srgb, var(--component-ink-2) 97%, transparent) !important;
+  color: var(--component-text);
+}
+
+html.tema-claro #painel .inspector-titlebar,
+html.tema-claro #painelEdicao,
+html.tema-claro .inspector-actionbar,
+html.tema-claro .statusbar {
+  border-color: var(--component-line);
+  background: var(--component-ink-3);
+  color: var(--component-muted);
+}
+
+html.tema-claro .section-card,
+html.tema-claro .clean-details,
+html.tema-claro .layer-group,
+html.tema-claro .branch-row,
+html.tema-claro .grupo-referencia,
+html.tema-claro .controle-vertice,
+html.tema-claro .grupo-opcoes,
+html.tema-claro .lista-relacoes,
+html.tema-claro .object-field-picker {
+  border-color: var(--component-line) !important;
+  background: var(--component-ink-2) !important;
+  color: var(--component-text);
+}
+
+html.tema-claro .section-card-title {
+  border-color: var(--component-line-soft);
+  background: var(--component-ink-3);
+  color: var(--component-text);
+}
+
+html.tema-claro .campo input,
+html.tema-claro .campo select,
+html.tema-claro .campo textarea,
+html.tema-claro .grupo-opcoes input,
+html.tema-claro .grupo-opcoes select {
+  border-color: var(--component-line) !important;
+  background: var(--component-ink-2) !important;
+  color: var(--component-text) !important;
+}
+
+html.tema-claro .inspector-tab,
+html.tema-claro .type-create-main,
+html.tema-claro .type-edit-action,
+html.tema-claro .type-new-action,
+html.tema-claro .segmented-control button,
+html.tema-claro .inspector-action-button,
+html.tema-claro .object-summary-actions button,
+html.tema-claro .acoes button,
+html.tema-claro .controle-vertice button {
+  border-color: var(--component-line) !important;
+  background: var(--component-ink-3) !important;
+  color: var(--component-muted) !important;
+}
+
+html.tema-claro .empty-editor,
+html.tema-claro .types-empty-state {
+  border-color: var(--component-line);
+  background: var(--component-ink-2);
+  color: var(--component-muted);
+}
+
+html.tema-claro .leaflet-bar a,
+html.tema-claro .leaflet-control-zoom a,
+html.tema-claro .toast {
+  border-color: var(--component-line) !important;
+  background: var(--component-ink-2) !important;
+  color: var(--component-text) !important;
+}
+
+/* Cores dos componentes compartilhados no tema claro. */
+html.tema-claro .map-search-option:hover,
+html.tema-claro .map-search-option:focus-visible,
+html.tema-claro .object-search-result:hover,
+html.tema-claro .object-search-result:focus-visible,
+html.tema-claro .object-search-result.ativo {
+  border-color: var(--component-line);
+  background: var(--component-accent-soft);
+  color: var(--component-text);
+}
+
+html.tema-claro .inspector-action-button.action-save:not(:disabled),
+html.tema-claro .destaque,
+html.tema-claro .mini-botao.destaque {
+  border-color: color-mix(in srgb, var(--component-accent) 48%, var(--component-line)) !important;
+  background: var(--component-accent-soft) !important;
+  color: var(--component-accent-strong) !important;
+}
+
+html.tema-claro .atlas-object-popup .leaflet-popup-content-wrapper,
+html.tema-claro .atlas-object-popup .leaflet-popup-tip,
+html.tema-claro .object-popup-destination,
+html.tema-claro .object-popup-data-card {
+  border-color: var(--component-line);
+  background: var(--component-ink-2);
+  color: var(--component-text);
+}
+
+html.tema-claro .object-popup-header {
+  border-color: var(--component-line-soft);
+  background: var(--component-ink-3);
+}
+
+html.tema-claro .atlas-object-popup .object-popup-header h3,
+html.tema-claro .object-popup-data-title,
+html.tema-claro .object-popup-data-fields p strong {
+  color: var(--component-text);
+}
+
+html.tema-claro .object-popup-eyebrow,
+html.tema-claro .object-popup-data-source,
+html.tema-claro .object-popup-section-title,
+html.tema-claro .atlas-object-popup .object-popup-data-fields p {
+  color: var(--component-muted);
+}
+
+html.tema-claro .object-popup-type,
+html.tema-claro .object-popup-count,
+html.tema-claro .object-popup-section,
+html.tema-claro .object-popup-actions {
+  border-color: var(--component-line-soft);
+  color: var(--component-muted);
+}
+
+html.tema-claro .object-popup-link-button,
+html.tema-claro .coordinate-calibration-actions .mini-botao {
+  border-color: var(--component-line);
+  background: var(--component-ink-3);
+  color: var(--component-text) !important;
+}
+
+html.tema-claro .object-popup-link-button:hover,
+html.tema-claro .object-popup-link-button:focus-visible,
+html.tema-claro .coordinate-calibration-actions .destaque,
+html.tema-claro #captureCalibrationButton.ativo {
+  border-color: var(--component-accent);
+  background: var(--component-accent-soft);
+  color: var(--component-accent-strong) !important;
+}
+
+@media (max-width: 700px) {
+  .main-command-menu {
+    border-radius: var(--component-radius-md);
+  }
+
+  .projects-shell {
+    width: calc(100% - 28px);
+    padding-top: 34px;
+  }
+
+  #painel.inspector {
+    border-radius: var(--component-radius-lg) var(--component-radius-lg) var(--component-radius-md) var(--component-radius-md) !important;
+  }
+
+  .integration-notice {
+    margin: 7px 8px 0;
+  }
+
+  .admin-content {
+    padding: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

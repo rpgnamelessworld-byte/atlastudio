@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlas Studio — Administração</title>
+
+  <script>
+    try {
+      if (localStorage.getItem("temaInterface") !== "escuro") {
+        document.documentElement.classList.add("tema-claro");
+      }
+    } catch (erro) {}
+  </script>
+
+  <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="css/atlas-theme.css">
+  <link rel="stylesheet" href="css/shared-components.css">
+  <link rel="stylesheet" href="css/controls.css">
+  <link rel="stylesheet" href="css/studio-interface.css">
+</head>
+
+<body class="admin-shell">
+  <aside class="admin-app-sidebar">
+    <a class="admin-brand" href="index.html#projetos" aria-label="Abrir meus projetos no Atlas Studio">
+      <span class="admin-brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="m3 6 5-3 8 3 5-3v15l-5 3-8-3-5 3Z"></path>
+          <path d="M8 3v15M16 6v15"></path>
+        </svg>
+      </span>
+      <span>Atlas Studio</span>
+    </a>
+
+    <nav class="admin-app-nav" aria-label="Navegação principal">
+      <span>Navegação</span>
+      <a href="index.html#projetos" aria-label="Biblioteca">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"></rect><rect x="14" y="4" width="6" height="6" rx="1"></rect><rect x="4" y="14" width="6" height="6" rx="1"></rect><rect x="14" y="14" width="6" height="6" rx="1"></rect></svg>
+        Biblioteca
+      </a>
+      <a class="active" href="admin.html" aria-current="page" aria-label="Administração">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"></circle><path d="M3.5 19c.5-3.2 2.3-5 5.5-5s5 1.8 5.5 5M17 10v6M14 13h6"></path></svg>
+        Administração
+      </a>
+    </nav>
+
+    <div class="admin-app-user">
+      <span class="admin-avatar">AL</span>
+      <span><strong>Administrador local</strong><small>Editor</small></span>
+    </div>
+  </aside>
+
+  <div class="admin-workspace">
+  <header class="admin-topbar">
+    <label class="admin-global-search">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"></circle><path d="m16 16 4 4"></path></svg>
+      <input id="adminGlobalSearch" type="search" placeholder="Buscar usuário" aria-label="Buscar usuário">
+    </label>
+
+    <div class="admin-top-actions">
+      <span id="adminSyncState" class="admin-sync-state">Carregando dados locais…</span>
+      <button id="adminTheme" class="admin-icon-button" type="button" title="Ativar modo claro" aria-label="Ativar modo claro">
+        <span class="admin-theme-icon" aria-hidden="true">☼</span>
+      </button>
+       <a class="admin-back" href="index.html">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"></path></svg>
+        <span>Voltar ao mapa</span>
+      </a>
+    </div>
+  </header>
+
+  <section class="admin-page-heading">
+    <div>
+      <p>Gerenciamento do projeto</p>
+      <h1>Usuários e permissões</h1>
+      <span>Configure perfis de acesso e políticas por mapa.</span>
+    </div>
+    <div id="adminProjectContext" class="admin-project-context" hidden></div>
+  </section>
+
+  <section class="integration-notice" aria-label="Estado da integração">
+    <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6M12 7h.01"></path></svg>
+    <p>
+      <strong>Políticas não aplicadas ao editor.</strong>
+      Estes cadastros são provisórios e salvos apenas neste navegador. Não controlam acesso nem restringem alterações nos mapas; a aplicação depende da futura integração de identidade e autorização.
+    </p>
+  </section>
+
+  <div class="admin-layout">
+    <aside class="admin-sidebar" aria-label="Usuários">
+      <div class="admin-sidebar-head">
+        <div class="admin-sidebar-title-row">
+          <p id="adminUserCount" class="admin-eyebrow">Usuários locais · 0</p>
+          <span class="source-chip">Provisório</span>
+        </div>
+
+        <label class="admin-search" for="adminUserSearch">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+          <input id="adminUserSearch" type="search" autocomplete="off" placeholder="Buscar usuário…">
+        </label>
+      </div>
+
+      <div id="adminUserList" class="admin-user-list"></div>
+
+      <div class="admin-sidebar-foot">
+        <button id="adminAddUser" class="admin-add-button" type="button">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>
+          Adicionar usuário local
+        </button>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <header class="admin-main-head">
+        <div class="admin-person">
+          <div id="adminWhoAvatar" class="admin-avatar large">AL</div>
+          <div class="admin-person-copy">
+            <div class="admin-person-title-row">
+              <h1 id="adminWhoName">Administrador local</h1>
+              <span id="adminWhoSource" class="source-chip">Local</span>
+            </div>
+            <p><span id="adminWhoEmail">admin.local@atlas</span><span aria-hidden="true">·</span><span id="adminWhoStatus">configuração provisória</span></p>
+          </div>
+        </div>
+
+        <div class="admin-head-actions">
+          <div class="profile-group" aria-label="Perfil base">
+            <span>Perfil base:</span>
+            <button class="profile-button editor" data-profile="editor" type="button">Editor</button>
+            <button class="profile-button visualizador" data-profile="visualizador" type="button">Visualizador</button>
+            <button class="profile-button restrito" data-profile="restrito" type="button">Restrito</button>
+          </div>
+
+          <button id="adminDeleteUser" class="admin-delete-button" type="button" title="Excluir usuário local">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13"></path></svg>
+            <span>Excluir</span>
+          </button>
+
+          <button id="adminSave" class="admin-save-button" type="button" disabled>
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"></path><path d="M9 21v-6h6v6M9 3v5h6"></path></svg>
+            Salvar políticas
+          </button>
+        </div>
+      </header>
+
+      <nav class="admin-tabs" aria-label="Configurações administrativas">
+        <button class="admin-tab active" data-tab="permissions" type="button">Permissões <span id="adminPermissionCount">(0/0)</span></button>
+        <button class="admin-tab" data-tab="maps" type="button">Mapas acessíveis <span id="adminMapCount">(0/0)</span></button>
+        <button class="admin-tab" data-tab="visibility" type="button">Visibilidade <span id="adminVisibilityCount">(0/0)</span></button>
+      </nav>
+
+      <section id="adminPermissionsPanel" class="admin-content" data-panel="permissions"></section>
+      <section id="adminMapsPanel" class="admin-content" data-panel="maps" hidden></section>
+      <section id="adminVisibilityPanel" class="admin-content" data-panel="visibility" hidden></section>
+
+      <footer class="admin-statusbar">
+        <span><b id="adminStatPermissions">0</b> permissões ativas</span>
+        <span class="status-separator" aria-hidden="true"></span>
+        <span><b id="adminStatMaps">0</b> mapas acessíveis</span>
+        <span class="status-separator" aria-hidden="true"></span>
+        <span id="adminStatProfile" class="profile-status editor">Editor</span>
+        <span class="status-spacer"></span>
+        <button id="adminRefreshMaps" class="admin-refresh-button" type="button">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"></path><path d="M20 5v6h-6"></path></svg>
+          Atualizar dados do Atlas
+        </button>
+      </footer>
+    </main>
+  </div>
+  </div>
+
+  <dialog id="adminUserDialog" class="admin-dialog">
+    <form id="adminUserForm" method="dialog">
+      <header>
+        <div>
+          <span class="admin-eyebrow">Cadastro provisório</span>
+          <h2>Adicionar usuário local</h2>
+        </div>
+        <button id="adminCloseUserDialog" class="dialog-close" type="button" aria-label="Fechar">×</button>
+      </header>
+
+      <p class="dialog-help">Este cadastro poderá ser substituído pelo usuário correspondente quando a integração de identidade estiver disponível.</p>
+
+      <label class="admin-field">
+        <span>Nome</span>
+        <input id="adminUserName" name="name" type="text" required maxlength="100" autocomplete="off" placeholder="Nome do usuário">
+      </label>
+
+      <label class="admin-field">
+        <span>E-mail</span>
+        <input id="adminUserEmail" name="email" type="email" required maxlength="160" autocomplete="off" placeholder="usuario@exemplo.com">
+      </label>
+
+      <label class="admin-field">
+        <span>Perfil inicial</span>
+        <select id="adminUserProfile" name="profile">
+          <option value="restrito">Restrito</option>
+          <option value="visualizador">Visualizador</option>
+          <option value="editor">Editor</option>
+        </select>
+      </label>
+
+      <footer>
+        <button id="adminCancelUser" class="dialog-secondary" type="button">Cancelar</button>
+        <button class="dialog-primary" type="submit">Adicionar usuário</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <div id="adminToast" class="admin-toast" role="status" aria-live="polite"></div>
+
+  <script src="js/system-dialog.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

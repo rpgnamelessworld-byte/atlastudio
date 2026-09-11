@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlas Studio</title>
+
+  <script>
+    try {
+      if (localStorage.getItem("temaInterface") !== "escuro") {
+        document.documentElement.classList.add("tema-claro");
+      }
+    } catch (erro) {}
+  </script>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <!-- Ordem da cascata: base, layout, componentes compartilhados e tema. -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/shell.css">
+  <link rel="stylesheet" href="css/workflow.css">
+  <link rel="stylesheet" href="css/inspector.css">
+  <link rel="stylesheet" href="css/creation.css">
+  <link rel="stylesheet" href="css/editor.css">
+  <link rel="stylesheet" href="css/atlas-theme.css">
+  <link rel="stylesheet" href="css/shared-components.css">
+  <link rel="stylesheet" href="css/controls.css">
+  <link rel="stylesheet" href="css/studio-interface.css">
+  <link rel="stylesheet" href="css/components/reading.css">
+</head>
+
+<body class="app-shell modo-visualizacao painel-fechado">
+  <header class="topbar">
+    <a id="abrirProjetosMarca" class="brand" href="#projetos" aria-label="Abrir meus projetos">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="m3 6 5-3 8 3 5-3v15l-5 3-8-3-5 3Z"></path>
+          <path d="M8 3v15M16 6v15"></path>
+        </svg>
+      </span>
+      <span class="brand-title">Atlas Studio</span>
+    </a>
+
+    <nav class="projects-sidebar-nav" aria-label="Navegação principal">
+      <span class="projects-sidebar-label">Navegação</span>
+      <a class="projects-sidebar-link active" href="#projetos" aria-current="page" aria-label="Biblioteca">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"></rect><rect x="14" y="4" width="6" height="6" rx="1"></rect><rect x="4" y="14" width="6" height="6" rx="1"></rect><rect x="14" y="14" width="6" height="6" rx="1"></rect></svg>
+        <span>Biblioteca</span>
+      </a>
+      <a id="administracaoBibliotecaLink" class="projects-sidebar-link" href="admin.html" aria-label="Administração">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"></circle><path d="M3.5 19c.5-3.2 2.3-5 5.5-5s5 1.8 5.5 5M17 10v6M14 13h6"></path></svg>
+        <span>Administração</span>
+      </a>
+    </nav>
+
+    <div class="projects-sidebar-user">
+      <span class="projects-sidebar-avatar">AL</span>
+      <span><strong>Administrador local</strong><small>Editor</small></span>
+    </div>
+
+    <div class="topbar-map">
+      <label class="sr-only" for="buscaMapa">Mapa ativo</label>
+
+      <div class="map-search-wrap">
+        <span class="map-search-icon" aria-hidden="true">⌕</span>
+        <input
+          id="buscaMapa"
+          type="search"
+          autocomplete="off"
+          placeholder="Buscar mapa..."
+          title="Buscar mapa pelo nome"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded="false"
+          aria-controls="listaMapasBusca"
+        >
+        <button
+          id="abrirListaMapas"
+          class="map-list-button"
+          type="button"
+          title="Mostrar todos os mapas"
+          aria-label="Mostrar todos os mapas"
+          aria-expanded="false"
+          aria-controls="listaMapasBusca"
+        >⌄</button>
+        <div id="listaMapasBusca" class="map-search-list" role="listbox" hidden></div>
+      </div>
+
+      <!-- Mantido para compatibilidade interna; a UI usa a busca acima. -->
+      <select id="seletorMapa" title="Mapa atual" hidden></select>
+    </div>
+
+    <label id="buscaProjetosTopoWrap" class="project-top-search" for="buscaProjetosTopo" hidden>
+      <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"></circle><path d="m16 16 4 4"></path></svg>
+      <input id="buscaProjetosTopo" type="search" autocomplete="off" placeholder="Buscar projeto ou mapa">
+    </label>
+
+    <div class="top-actions">
+      <button
+        id="abrirMenuPrincipal"
+        type="button"
+        class="top-button icon-only main-menu-trigger"
+        title="Abrir menu principal"
+        aria-label="Abrir menu principal"
+        aria-haspopup="menu"
+        aria-expanded="false"
+        aria-controls="menuPrincipal"
+      >
+        <svg class="top-action-svg" aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M5 7h14M5 12h14M5 17h14"></path>
+        </svg>
+      </button>
+
+      <div id="menuPrincipal" class="main-command-menu" role="menu" aria-label="Menu principal" hidden>
+        <div class="main-command-group">
+          <span class="main-command-group-title">Navegação</span>
+
+          <button id="pesquisarObjetos" type="button" class="menu-command" role="menuitem">
+            <span class="menu-command-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"></circle><path d="m16 16 4 4"></path></svg>
+            </span>
+            <span class="menu-command-label">Pesquisar objetos</span>
+            <kbd class="menu-command-shortcut">Ctrl F</kbd>
+          </button>
+        </div>
+
+        <div class="main-command-group">
+          <span class="main-command-group-title">Projeto</span>
+
+          <button id="abrirProjetos" type="button" class="menu-command" role="menuitem">
+            <span class="menu-command-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"></rect><rect x="14" y="4" width="6" height="6" rx="1"></rect><rect x="4" y="14" width="6" height="6" rx="1"></rect><rect x="14" y="14" width="6" height="6" rx="1"></rect></svg>
+            </span>
+            <span class="menu-command-label">Meus projetos</span>
+          </button>
+
+          <button id="novoProjetoMenu" type="button" class="menu-command menu-primary" role="menuitem">
+            <span class="menu-command-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 7h6l2 2h8v10H4Z"></path><path d="M12 12v5M9.5 14.5h5"></path></svg>
+            </span>
+            <span class="menu-command-label">Novo projeto</span>
+          </button>
+        </div>
+
+        <div class="main-command-group">
+          <span class="main-command-group-title">Mapa</span>
+
+          <button id="novoMapa" type="button" class="menu-command menu-primary" role="menuitem">
+            <span class="menu-command-icon" aria-hidden="true">⊕</span>
+            <span class="menu-command-label">Criar mapa</span>
+          </button>
+
+          <button id="renomearMapa" type="button" class="menu-command" role="menuitem">
+            <span class="menu-command-icon" aria-hidden="true">✎</span>
+            <span class="menu-command-label">Renomear mapa</span>
+          </button>
+
+          <button id="excluirMapa" type="button" class="menu-command menu-danger" role="menuitem">
+            <span class="menu-command-icon" aria-hidden="true">×</span>
+            <span class="menu-command-label">Excluir mapa</span>
+          </button>
+        </div>
+
+        <div class="main-command-group">
+          <span class="main-command-group-title">Backup e dados</span>
+          <button id="verificarVinculos" type="button" class="menu-command" role="menuitem">Verificar vínculos do projeto</button>
+          <small id="ultimoBackup" class="backup-indicator">Nenhum backup exportado registrado</small>
+
+          <button id="salvarProjeto" type="button" class="menu-command menu-primary" role="menuitem">
+            <span class="menu-command-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 4h12l2 2v14H5Z"></path><path d="M8 4v6h8V4M8 20v-6h8v6"></path></svg>
+            </span>
+            <span class="menu-command-label">Salvar projeto</span>
+            <kbd class="menu-command-shortcut">Ctrl S</kbd>
+          </button>
+
+          <button id="exportarMapa" type="button" class="menu-command" role="menuitem">
+            <span class="menu-command-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 20h14"></path></svg>
+            </span>
+            <span class="menu-command-label">Exportar projeto</span>
+          </button>
+
+          <button id="importarMapa" type="button" class="menu-command" role="menuitem">
+            <span class="menu-command-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 21V9"></path><path d="m7 14 5-5 5 5"></path><path d="M5 4h14"></path></svg>
+            </span>
+            <span class="menu-command-label">Importar projeto</span>
+          </button>
+        </div>
+
+        <div class="main-command-group">
+          <span class="main-command-group-title">Aplicativo</span>
+
+          <a href="admin.html" class="menu-command admin-entry" role="menuitem">
+            <span class="menu-command-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"></circle><path d="M3.5 19c.5-3.2 2.3-5 5.5-5s5 1.8 5.5 5"></path><path d="M17 10v6M14 13h6"></path></svg>
+            </span>
+            <span class="menu-command-label">Administração <small>Políticas ainda não aplicadas</small></span>
+          </a>
+
+          <button id="alternarTema" type="button" class="menu-command" role="menuitem" title="Ativar modo claro" aria-label="Ativar modo claro">
+            <span class="menu-command-icon tema-icone" aria-hidden="true">☼</span>
+            <span class="menu-command-label">Ativar modo claro</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="top-spacer"></div>
+
+    <div class="modo-switch top-mode-switch">
+      <button id="modoVisualizacao" type="button" class="ativo icon-only" title="Modo Visualização">
+        <span aria-hidden="true">◉</span>
+        <span class="sr-only">Modo Visualização</span>
+      </button>
+      <button id="modoEdicao" type="button" class="icon-only" title="Modo Edição (Ctrl + E)">
+        <span aria-hidden="true">✎</span>
+        <span class="sr-only">Modo Edição</span>
+      </button>
+    </div>
+  </header>
+
+  <div id="buscaObjetosOverlay" class="object-search-overlay" hidden>
+    <section
+      class="object-search-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="tituloBuscaObjetos"
+    >
+      <header class="object-search-header">
+        <span class="object-search-symbol" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"></circle><path d="m16 16 4 4"></path></svg>
+        </span>
+
+        <div class="object-search-field">
+          <label id="tituloBuscaObjetos" class="sr-only" for="buscaObjetosInput">Pesquisar objetos</label>
+          <input
+            id="buscaObjetosInput"
+            type="search"
+            autocomplete="off"
+            placeholder="Digite o nome, Tipo ou mapa..."
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded="true"
+            aria-controls="resultadosBuscaObjetos"
+          >
+        </div>
+
+        <button id="fecharBuscaObjetos" class="object-search-close" type="button" title="Fechar pesquisa" aria-label="Fechar pesquisa">×</button>
+      </header>
+
+      <div id="resultadosBuscaObjetos" class="object-search-results" role="listbox" aria-label="Objetos encontrados"></div>
+      <p id="estadoBuscaObjetos" class="object-search-state" role="status" aria-live="polite"></p>
+
+      <footer class="object-search-footer">
+        <span><kbd>↑</kbd><kbd>↓</kbd> navegar</span>
+        <span><kbd>Enter</kbd> localizar</span>
+        <span><kbd>Esc</kbd> fechar</span>
+      </footer>
+    </section>
+  </div>
+
+  <main id="gerenciadorProjetos" class="projects-view" hidden>
+    <button id="alternarTemaBiblioteca" class="projects-theme-toggle" type="button" title="Ativar modo escuro" aria-label="Ativar modo escuro">
+      <span class="projects-theme-icon" aria-hidden="true">☾</span>
+    </button>
+    <section class="projects-shell" aria-labelledby="tituloProjetos">
+      <header class="projects-heading">
+        <div>
+          <p class="projects-eyebrow">Seus mundos e campanhas</p>
+          <h1 id="tituloProjetos">Biblioteca de projetos</h1>
+          <p>Cada projeto reúne os mapas de um mesmo mundo ou campanha.</p>
+        </div>
+      </header>
+
+      <label class="project-mobile-search" for="buscaProjetosMobile">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"></circle><path d="m16 16 4 4"></path></svg>
+        <input id="buscaProjetosMobile" type="search" autocomplete="off" placeholder="Buscar projeto ou mapa">
+      </label>
+
+      <div id="listaProjetos" class="projects-grid" aria-live="polite"></div>
+
+      <section id="projetosVazio" class="projects-empty" hidden>
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m5 8 7-4 7 4-7 4Z"></path><path d="m5 12 7 4 7-4M5 16l7 4 7-4"></path></svg>
+        <h2>Nenhum projeto ainda</h2>
+        <p>Comece criando um projeto e adicione quantos mapas quiser dentro dele.</p>
+        <button id="criarPrimeiroProjeto" class="atlas-primary-button" type="button">
+          <span aria-hidden="true">＋</span> Criar primeiro projeto
+        </button>
+      </section>
+
+      <p id="projetosSemResultado" class="projects-no-results" hidden>Nenhum projeto ou mapa corresponde à busca.</p>
+    </section>
+  </main>
+
+  <main class="workspace">
+    <!-- O Inspector reposiciona estes controles no rodapé durante a montagem. -->
+    <div hidden>
+      <button id="salvarRail" type="button" title="Salvar edição" disabled>
+        <span class="rail-icon" aria-hidden="true">✓</span>
+        <span class="sr-only">Salvar</span>
+      </button>
+
+      <button id="apagarRail" type="button" title="Apagar ponto ou objeto (Del)" disabled>
+        <span class="rail-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"></path>
+          </svg>
+        </span>
+        <span class="sr-only">Apagar</span>
+      </button>
+
+      <button id="cancelarRail" type="button" title="Cancelar edição" disabled>
+        <span class="rail-icon" aria-hidden="true">×</span>
+        <span class="sr-only">Cancelar</span>
+      </button>
+    </div>
+
+    <section class="map-stage">
+      <div id="mapa"></div>
+
+      <div id="acoesMapa" class="map-action-toolbar" role="group" aria-label="Ações do mapa" hidden>
+        <div class="map-action-buttons">
+          <button type="button" data-acao-mapa="explorar" aria-pressed="true">Explorar</button>
+          <button type="button" data-acao-mapa="criar" aria-pressed="false">+ Criar</button>
+          <button type="button" data-acao-mapa="editar" aria-haspopup="dialog">Editar</button>
+          <button type="button" data-acao-mapa="ferramentas" aria-haspopup="menu" aria-controls="menuRadialMapa">Ferramentas</button>
+        </div>
+        <p id="estadoInteracaoMapa" role="status" aria-live="polite"></p>
+        <button type="button" data-acao-mapa="posicionar" hidden>Adicionar ponto no centro do mapa</button>
+      </div>
+
+      <button
+        id="estadoMapaVazio"
+        class="map-empty-state"
+        type="button"
+        aria-label="Criar o primeiro mapa deste projeto"
+      >
+        <span id="estadoMapaVazioProjeto" class="map-empty-project">Novo projeto</span>
+        <span class="map-empty-instruction">
+          Crie um mapa aqui ou <kbd>Ctrl + A</kbd>
+        </span>
+      </button>
+
+      <div
+        id="menuRadialMapa"
+        class="map-radial-menu"
+        role="menu"
+        aria-label="Ferramentas do mapa"
+        hidden
+      >
+        <button class="radial-action radial-n" type="button" role="menuitem" data-radial-action="edicao" title="Edição (Ctrl + E)" aria-label="Edição (Ctrl + E)">
+          <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 20 4.2-1 10.6-10.6-3.2-3.2L5 15.8 4 20Z"></path><path d="m14.5 6.3 3.2 3.2"></path></svg></span>
+          <small>Edição</small>
+        </button>
+        <button class="radial-action radial-ne" type="button" role="menuitem" data-radial-action="camadas" title="Camadas (Ctrl + Q)" aria-label="Camadas (Ctrl + Q)">
+          <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 7h14M5 12h14M5 17h14"></path></svg></span>
+          <small>Camadas</small>
+        </button>
+        <button class="radial-action radial-se" type="button" role="menuitem" data-radial-action="criacao" title="Criar (Ctrl + A)" aria-label="Criar (Ctrl + A)">
+          <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg></span>
+          <small>Criar</small>
+        </button>
+        <button class="radial-action radial-s" type="button" role="menuitem" data-radial-action="dados" title="Dados (Ctrl + D)" aria-label="Dados (Ctrl + D)">
+          <span aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="1"></rect><path d="M8 8h8M8 12h8M8 16h8"></path></svg></span>
+          <small>Dados</small>
+        </button>
+        <button class="radial-action radial-sw" type="button" role="menuitem" data-radial-action="legenda" title="Legenda (Ctrl + L)" aria-label="Legenda (Ctrl + L)">
+          <span aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="2.5"></circle><path d="M13 8h6M5 15h14M5 19h10"></path></svg></span>
+          <small>Legenda</small>
+        </button>
+        <button class="radial-action radial-nw" type="button" role="menuitem" data-radial-action="coordenadas">
+          <span aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 3v4M12 17v4M3 12h4M17 12h4"></path></svg></span>
+          <small>Coordenadas</small>
+        </button>
+
+        <button id="fecharMenuRadial" class="radial-close" type="button" title="Fechar menu" aria-label="Fechar menu">×</button>
+      </div>
+
+      <div id="barraCriacaoRapida" class="quick-create-bar" aria-label="Atalhos de criação" hidden>
+        <button id="selecaoRapida" class="quick-create-action" type="button" title="Voltar para seleção" aria-label="Voltar para seleção">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 4 11 8-6 1.5L8.5 19 6 4Z"></path></svg>
+        </button>
+        <span class="quick-create-divider" aria-hidden="true"></span>
+        <div id="tiposCriacaoRapida" class="quick-create-types"></div>
+        <span class="quick-create-divider" aria-hidden="true"></span>
+        <button id="novoTipoRapido" class="quick-create-action" type="button" title="Criar novo tipo de marcação" aria-label="Criar novo tipo de marcação">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>
+        </button>
+        <button id="gerenciarTiposRapido" class="quick-create-action" type="button" title="Gerenciar tipos de marcação" aria-label="Gerenciar tipos de marcação">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+        </button>
+        <button id="fecharCriacaoRapida" class="quick-create-action" type="button" title="Fechar atalhos de criação" aria-label="Fechar atalhos de criação">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"></path></svg>
+        </button>
+        <div id="menuGrupoCriacaoRapida" class="quick-create-popover" role="menu" hidden></div>
+      </div>
+
+      <button id="abrirLegendaVisual" class="map-legend-trigger" type="button" title="Ver legenda e camadas (Ctrl + L)" aria-label="Ver legenda e camadas (Ctrl + L)">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="7" cy="7" r="2"></circle><path d="M12 7h7M5 13h14M5 18h10"></path></svg>
+        <span>Legenda</span>
+      </button>
+
+      <div id="contextoGeometria" class="map-context-chip" hidden>
+        <span id="contextoGeometriaTexto"></span>
+      </div>
+    </section>
+
+    <!-- ===================================================
+         DIREITA = CRIAÇÃO / CADASTRO CONTEXTUAL
+         =================================================== -->
+    <aside id="painel" class="painel inspector inspector-contextual">
+      <div
+        id="redimensionarPainel"
+        class="inspector-resize-handle"
+        role="separator"
+        aria-label="Redimensionar painel"
+        aria-orientation="vertical"
+        tabindex="0"
+        title="Arraste para redimensionar o painel"
+      ></div>
+      <div
+        id="redimensionarAlturaPainel"
+        class="inspector-resize-height"
+        role="separator"
+        aria-label="Redimensionar altura do painel"
+        aria-orientation="horizontal"
+        tabindex="0"
+        title="Arraste para ajustar a altura do painel"
+      ></div>
+      <div class="painel-cabecalho inspector-titlebar">
+        <strong id="tituloPainel">Editor</strong>
+        <button id="fecharPainel" class="fechar" type="button" title="Fechar painel">×</button>
+      </div>
+
+      <section id="painelVisualizacao" class="inspector-section">
+        <p class="texto-ajuda">
+          Visualize as camadas, controle a visibilidade e localize os objetos deste mapa.
+        </p>
+
+        <div class="section-card">
+          <div class="section-card-title">Camadas do mapa</div>
+          <div id="legendaAutomatica" class="legenda-auto"></div>
+        </div>
+      </section>
+
+      <section id="painelEdicao" class="inspector-section" hidden>
+        <div id="status" class="status" hidden></div>
+
+        <!-- Estado do Inspector sem seleção ativa. -->
+        <div id="painelInicioEdicao" class="editor-state">
+          <div class="empty-editor">
+            <div class="empty-editor-icon">＋</div>
+            <strong id="mensagemInicioTitulo">Comece criando um tipo de marcação</strong>
+            <p id="mensagemInicioTexto">
+              O lado direito é usado para cadastrar o que poderá existir no mapa.
+              Depois de criado, o tipo aparece automaticamente na barra inferior.
+            </p>
+            <button id="criarPrimeiraCategoria" class="primary-wide" type="button">
+              ＋ Criar tipo de marcação
+            </button>
+          </div>
+        </div>
+
+        <!-- Resumo do objeto selecionado antes da edição. -->
+        <div id="selecaoObjeto" class="editor-state selecao-objeto" hidden>
+          <div class="object-summary-head">
+            <div>
+              <small>Objeto selecionado</small>
+              <strong id="objetoNome"></strong>
+              <span id="objetoCategoria"></span>
+            </div>
+          </div>
+
+          <div class="object-summary-actions">
+            <button id="editarObjeto" class="destaque" type="button">✎ Editar objeto</button>
+            <button id="editarCategoriaObjeto" type="button">⚙ Editar tipo</button>
+            <button id="removerObjeto" class="perigo object-remove-action" type="button" title="Remover objeto selecionado (Del)">Remover objeto</button>
+          </div>
+
+          <p class="texto-ajuda compacto">
+            Edite os dados e a posição deste objeto ou altere a aparência e o comportamento do Tipo usado por ele.
+          </p>
+        </div>
+
+        <!-- Formulário contextual de cadastro e edição de Tipo. -->
+        <div id="modalCategoria" class="editor-state category-editor-inline" hidden>
+          <div class="inline-editor-title">
+            <div>
+              <small>Cadastro</small>
+              <strong id="tituloModalCategoria">Criar tipo de marcação</strong>
+            </div>
+            <button id="fecharCategoria" class="fechar" type="button">×</button>
+          </div>
+
+          <form id="formCategoria">
+            <div class="campo">
+              <label for="nomeCategoria">Nome do tipo</label>
+              <input id="nomeCategoria" type="text" placeholder="Região, Estrada, Cidade..." autocomplete="off">
+            </div>
+
+            <div class="campo">
+              <label for="geometriaCategoria">Tipo de marcação</label>
+              <select id="geometriaCategoria">
+                <option value="unico">Único</option>
+                <option value="linha">Linha</option>
+                <option value="area">Área</option>
+                <option value="conexao">Conexão</option>
+              </select>
+              <small id="ajudaGeometriaCategoria" hidden>
+                O tipo de marcação fica bloqueado enquanto existirem objetos deste Tipo, evitando perder posições e trajetos já definidos.
+              </small>
+            </div>
+
+            <div id="campoRepresentacaoConexao" class="campo" hidden>
+              <label for="representacaoConexao">Representação da conexão</label>
+              <select id="representacaoConexao">
+                <option value="caminho">Caminho visível</option>
+                <option value="passagem">Somente passagem (ícone)</option>
+              </select>
+              <small>Conecta objetos, regiões ou posições, neste mapa ou em outro. A travessia é sempre uma ação explícita.</small>
+            </div>
+
+            <!-- Controles preservados para leitura de rascunhos antigos. -->
+            <div id="campoComportamentoUnico" class="campo" hidden>
+              <label for="comportamentoCategoria">Comportamento</label>
+              <select id="comportamentoCategoria">
+                <option value="">Comum</option>
+                <option value="portal">Portal entre mapas</option>
+              </select>
+            </div>
+
+            <div id="campoComportamentoLinha" class="campo" hidden>
+              <label for="comportamentoLinhaCategoria">Comportamento</label>
+              <select id="comportamentoLinhaCategoria">
+                <option value="">Comum</option>
+                <option value="relacao">Relação entre locais</option>
+              </select>
+              <small>
+                Relação conecta pontos ou regiões, inclusive entre mapas diferentes.
+              </small>
+            </div>
+
+            <!-- Ícones são usados apenas por Tipos pontuais. -->
+            <div id="campoIconeCategoria" class="campo">
+              <label>Ícone</label>
+              <div id="gradeIcones" class="grade-icones"></div>
+            </div>
+
+            <!-- A cor é compartilhada pelas três geometrias. -->
+            <div class="campo">
+              <label>Cor</label>
+              <div id="gradeCores" class="grade-cores"></div>
+            </div>
+
+            <div class="campo">
+              <label for="corHex">Cor personalizada</label>
+              <input id="corHex" type="text" maxlength="7" placeholder="#D7DDE3" autocomplete="off">
+            </div>
+
+            <!-- Aparência das Linhas. -->
+            <div id="opcoesLinha" class="grupo-opcoes" hidden>
+              <div class="campo">
+                <label for="larguraLinha">Espessura</label>
+                <input id="larguraLinha" type="number" min="1" max="200" value="24">
+              </div>
+
+              <div class="campo">
+                <label for="estiloLinha">Estilo</label>
+                <select id="estiloLinha">
+                  <option value="continuo">Contínuo</option>
+                  <option value="tracejado">Tracejado</option>
+                  <option value="pontilhado">Pontilhado</option>
+                  <option value="traco-ponto">Traço-ponto</option>
+                </select>
+              </div>
+
+              <div class="campo">
+                <label for="extremidadeLinha">Extremidade</label>
+                <select id="extremidadeLinha">
+                  <option value="arredondada">Arredondada</option>
+                  <option value="reta">Reta</option>
+                </select>
+              </div>
+
+              <div class="campo">
+                <label for="opacidadeLinha">
+                  Opacidade:
+                  <span id="valorOpacidade">35%</span>
+                </label>
+                <input id="opacidadeLinha" type="range" min="5" max="100" value="35">
+              </div>
+            </div>
+
+            <!-- Aparência e títulos das Áreas. -->
+            <div id="opcoesArea" class="grupo-opcoes" hidden>
+              <div class="campo">
+                <label for="areaOpacidade">
+                  Opacidade da área:
+                  <span id="valorOpacidadeArea">15%</span>
+                </label>
+                <input id="areaOpacidade" type="range" min="0" max="100" value="15">
+              </div>
+
+              <div class="campo">
+                <label for="tamanhoFonte">Tamanho padrão do título</label>
+                <input id="tamanhoFonte" type="number" min="4" max="80" value="14">
+                <small>
+                  Aplicado às Áreas deste Tipo. O tamanho ainda pode ser personalizado em cada objeto.
+                </small>
+              </div>
+            </div>
+
+            <label id="campoExibirEmAreasCategoria" class="check-row">
+              <input id="exibirEmAreasCategoria" type="checkbox" checked>
+              <span>Exibir objetos deste tipo no resumo de Áreas</span>
+            </label>
+
+            <!-- As ações do objeto ficam exclusivamente na barra contextual do Inspector. -->
+          </form>
+        </div>
+
+        <!-- Criação / edição de objeto -->
+        <div id="editorObjetoWrap" class="editor-state" hidden>
+          <div class="inline-editor-title">
+            <div>
+              <small id="modoObjetoLabel">Criação</small>
+              <strong id="tituloFormularioObjeto">Novo objeto</strong>
+            </div>
+          </div>
+
+          <form id="formObjeto">
+            <details class="clean-details" open>
+              <summary>Informações básicas <span>opcional</span></summary>
+
+              <div class="campo">
+                <label for="nomeObjeto">Nome</label>
+                <input id="nomeObjeto" type="text" placeholder="Pode ficar vazio para teste" autocomplete="off">
+              </div>
+
+              <div class="campo">
+                <label for="descricaoObjeto">Descrição</label>
+                <textarea id="descricaoObjeto" placeholder="Opcional"></textarea>
+              </div>
+            </details>
+
+            <details class="clean-details">
+              <summary>Fonte principal <span>opcional</span></summary>
+
+              <div class="grupo-referencia slim-reference">
+                <div class="campo">
+                  <label for="fonteObjeto">Tabela / fonte</label>
+                  <select id="fonteObjeto">
+                    <option value="">Nenhuma</option>
+                  </select>
+                </div>
+
+                <div class="campo">
+                  <label for="registroObjeto">Registro</label>
+                  <select id="registroObjeto" disabled>
+                    <option value="">Nenhum</option>
+                  </select>
+                </div>
+
+                <div class="campo" id="grupoCamposReferenciaObjeto" hidden>
+                  <label>Dados que aparecerão neste box</label>
+                  <div id="camposReferenciaObjeto" class="object-field-picker"></div>
+                  <small>Você pode escolher um subconjunto diferente do padrão da planilha.</small>
+                </div>
+              </div>
+            </details>
+
+            <!-- Configuração exclusiva dos Portais. -->
+            <div id="grupoPortal" class="conditional-card portal-config" hidden>
+              <strong class="subtitulo">Conexão · passagem</strong>
+
+              <div class="campo">
+                <label for="portalDirecao">Funcionamento</label>
+                <select id="portalDirecao">
+                  <option value="bidirecional">Ida e volta</option>
+                  <option value="unidirecional">Somente ida</option>
+                </select>
+                <small>
+                  Ida e volta cria uma passagem de retorno. Somente ida cria uma chegada sem retorno.
+                </small>
+              </div>
+
+              <div class="campo">
+                <label for="portalMapaDestino">Mapa de destino</label>
+                <select id="portalMapaDestino">
+                  <option value="">Sem destino por enquanto</option>
+                </select>
+              </div>
+
+              <div class="portal-create-action">
+                <button id="criarMapaDestinoPortal" class="mini-botao subtle-button" type="button">
+                  ＋ Criar mapa de destino
+                </button>
+              </div>
+
+              <div class="campo" id="grupoPortalAreaDestino" hidden>
+                <label for="portalAreaDestino">Local de chegada</label>
+                <select id="portalAreaDestino">
+                  <option value="">Posição no mapa</option>
+                </select>
+                <small>
+                  Escolha um objeto ou região como referência. A chegada não transforma esse objeto em uma passagem.
+                </small>
+              </div>
+            </div>
+
+            <!-- Vínculos de dados podem ser associados a qualquer objeto. -->
+            <details id="grupoRelacoesArea" class="clean-details">
+              <summary>Vínculos de dados <span>opcional</span></summary>
+
+              <p class="texto-ajuda compacto">
+                Ex.: Proprietário → NPCs → Camila; Herbário → Plantas → Musgo Áureo.
+              </p>
+
+              <div class="campo">
+                <label for="rotuloRelacao">Nome do vínculo</label>
+                <input id="rotuloRelacao" type="text" placeholder="Proprietário, Herbário, Responsável...">
+              </div>
+
+              <div class="campo">
+                <label for="fonteRelacao">Tabela / fonte</label>
+                <select id="fonteRelacao">
+                  <option value="">Selecione</option>
+                </select>
+              </div>
+
+              <div class="campo">
+                <label for="registroRelacao">Registro</label>
+                <select id="registroRelacao" disabled>
+                  <option value="">Selecione</option>
+                </select>
+              </div>
+
+              <div class="campo" id="grupoCamposRelacao" hidden>
+                <label>Dados exibidos neste vínculo</label>
+                <div id="camposRelacaoObjeto" class="object-field-picker"></div>
+              </div>
+
+              <button id="adicionarRelacao" class="mini-botao" type="button">
+                ＋ Adicionar vínculo
+              </button>
+
+              <div id="listaRelacoesArea" class="lista-relacoes"></div>
+            </details>
+
+            <details class="clean-details">
+              <summary>Link <span>opcional</span></summary>
+
+              <div class="campo">
+                <label for="linkObjeto">Endereço</label>
+                <input id="linkObjeto" type="text" placeholder="/wiki/Pagina" autocomplete="off">
+              </div>
+
+              <div class="campo">
+                <label for="textoLinkObjeto">Texto clicável</label>
+                <input id="textoLinkObjeto" type="text" placeholder="Clique aqui" autocomplete="off">
+              </div>
+            </details>
+
+            <div id="controleVertice" class="controle-vertice compact-vertex" hidden>
+              <span id="verticeSelecionado">Nenhum ponto selecionado</span>
+              <button id="removerVertice" class="perigo" type="button">
+                Remover ponto selecionado
+              </button>
+
+              <div id="controlesRamificacao" class="branch-controls" hidden>
+                <button id="criarRamificacao" class="mini-botao" type="button" disabled>
+                  ＋ Criar ramificação deste ponto
+                </button>
+                <button id="finalizarRamificacao" class="mini-botao" type="button" hidden>
+                  ✓ Finalizar ramificação
+                </button>
+                <div id="listaRamificacoes" class="branch-list"></div>
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+        <!-- Gerenciador de Fontes de dados. -->
+        <div id="painelDadosEdicao" class="editor-state" hidden>
+          <div class="inline-editor-title">
+            <div>
+              <small>Projeto</small>
+              <strong>Dados de referência</strong>
+            </div>
+          </div>
+
+          <p class="texto-ajuda">
+            Importe XLS/XLSX/CSV. As fontes podem ser usadas por qualquer
+            Região, Local, NPC, recurso ou outro objeto criado no mapa.
+          </p>
+
+          <button id="importarPlanilha" class="primary-wide" type="button">
+            ＋ Importar planilha
+          </button>
+
+          <div id="listaFontesDados" class="lista-fontes data-source-list"></div>
+
+        </div>
+      </section>
+
+      <input id="arquivoNovoMapa" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+      <input id="arquivoImportar" type="file" accept=".atlasproject,.nwmap,.json,application/json" hidden>
+      <input id="arquivoNovoMapaPortal" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+    </aside>
+  </main>
+
+  <aside id="recuperacaoRascunho" class="draft-recovery" aria-label="Rascunhos recuperáveis" hidden></aside>
+  <dialog id="dialogoVinculos" class="integrity-dialog">
+    <h2>Vínculos do projeto</h2>
+    <p>Vínculos quebrados são preservados para que você possa corrigir o destino.</p>
+    <div id="listaVinculos"></div>
+    <form method="dialog"><button type="submit">Fechar</button></form>
+  </dialog>
+  <aside id="painelConsulta" class="atlas-reading-panel atlas-object-popup" aria-label="Consulta do mapa" hidden>
+    <div class="consulta-panel-heading"><strong>Consulta</strong><span>Permanece aberta ao explorar o mapa</span><button id="fecharConsulta" type="button" aria-label="Fechar consulta">×</button></div>
+    <div id="conteudoConsulta"></div>
+  </aside>
+  <footer class="statusbar">
+    <div id="estadoSalvamento" role="status" aria-live="polite">Salvo neste navegador</div>
+    <div>X: <strong id="statusX">—</strong></div>
+    <div>Y: <strong id="statusY">—</strong></div>
+    <div class="status-divider"></div>
+    <div>Zoom: <strong id="statusZoom">—</strong></div>
+    <div class="status-divider"></div>
+    <div class="radial-shortcut-hint">Botão direito: ferramentas · 2 cliques: criar</div>
+    <div class="status-spacer"></div>
+    <div>Objetos selecionados: <strong id="statusSelecionados">0</strong></div>
+  </footer>
+
+  <!-- =====================================================
+       MODAL DE IMPORTAÇÃO / CONFIGURAÇÃO DA PLANILHA
+       ===================================================== -->
+  <div id="modalFonteDados" class="modal" hidden>
+    <div class="modal-caixa modal-dados">
+      <div class="painel-cabecalho">
+        <strong id="tituloModalFonte">Importar dados</strong>
+        <button id="fecharFonteDados" class="fechar" type="button">×</button>
+      </div>
+
+      <form id="formFonteDados">
+        <div class="campo">
+          <label for="nomeFonteDados">Nome da fonte</label>
+          <input id="nomeFonteDados" type="text" placeholder="NPCs">
+        </div>
+
+        <div class="campo">
+          <label for="tipoEntidadeFonte">Tipo de informação</label>
+          <input id="tipoEntidadeFonte" type="text" placeholder="NPC, Recurso, Planta, Local...">
+        </div>
+
+        <div id="campoAbaFonte" class="campo">
+          <label for="abaFonteDados">Aba da planilha</label>
+          <select id="abaFonteDados"></select>
+        </div>
+
+        <div class="campo">
+          <label for="colunaIdFonte">Coluna de ID</label>
+          <select id="colunaIdFonte"></select>
+          <small>
+            Prefira um ID estável como NPC_014, LOC_001 ou REC_001.
+          </small>
+        </div>
+
+        <div class="campo">
+          <label for="colunaTituloFonte">Coluna usada como nome</label>
+          <select id="colunaTituloFonte"></select>
+        </div>
+
+        <div class="campo">
+          <label>Campos disponíveis no mapa</label>
+          <div id="camposFonteDados" class="campos-planilha"></div>
+          <small>
+            Este é o padrão da fonte. Na criação de cada objeto você ainda
+            poderá escolher apenas os campos que quer mostrar naquele caso.
+          </small>
+        </div>
+
+        <div id="resumoAtualizacaoFonte" class="status" hidden></div>
+
+        <div class="acoes grade-2">
+          <button id="cancelarFonteDados" type="button">Cancelar</button>
+          <button class="destaque" type="submit">Salvar configuração</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <input
+    id="arquivoPlanilha"
+    type="file"
+    accept=".xlsx,.xls,.xlsm,.csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"
+    hidden
+  >
+
+  <div id="toast" class="toast"></div>
+
+  <dialog id="projetoDialog" class="project-dialog">
+    <form id="projetoForm" method="dialog">
+      <header>
+        <div>
+          <span class="projects-eyebrow">Projeto</span>
+          <h2 id="projetoDialogTitulo">Novo projeto</h2>
+        </div>
+        <button id="fecharProjetoDialog" class="project-dialog-close" type="button" aria-label="Fechar">×</button>
+      </header>
+      <label>
+        <span>Nome do projeto</span>
+        <input id="nomeProjeto" type="text" maxlength="100" autocomplete="off" placeholder="Ex.: Nameless World" required>
+      </label>
+      <label>
+        <span>Descrição <small>opcional</small></span>
+        <textarea id="descricaoProjeto" maxlength="240" rows="3" placeholder="Mundo, campanha ou coleção de mapas"></textarea>
+      </label>
+      <footer>
+        <button id="cancelarProjeto" type="button">Cancelar</button>
+        <button class="atlas-primary-button" type="submit">Salvar projeto</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="seletorEdicaoObjeto" class="interaction-picker" aria-labelledby="tituloSeletorEdicao">
+    <form method="dialog" class="interaction-picker-heading">
+      <h2 id="tituloSeletorEdicao">Escolha um objeto para editar</h2>
+      <button type="submit" aria-label="Fechar seleção de objeto">×</button>
+    </form>
+    <label for="buscaEdicaoObjeto">Buscar por nome ou Tipo</label>
+    <input id="buscaEdicaoObjeto" type="search" autocomplete="off" placeholder="Nome ou Tipo do objeto" autofocus>
+    <p id="contagemEdicaoObjeto" role="status" aria-live="polite"></p>
+    <div id="resultadosEdicaoObjeto"></div>
+    <button id="maisEdicaoObjeto" type="button" hidden>Mostrar mais 30</button>
+  </dialog>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Scripts clássicos compartilham o escopo global; dependências precedem seus consumidores. -->
+  <script src="js/system-dialog.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/geometry.js"></script>
+  <script src="js/persistence.js"></script>
+  <script src="js/history.js"></script>
+  <script src="js/projects.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/maps.js"></script>
+  <script src="js/rendering.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/connections.js"></script>
+  <script src="js/connection-editor.js"></script>
+  <script src="js/recovery.js"></script>
+  <script src="js/reading.js"></script>
+  <script src="js/interaction.js"></script>
+  <script src="js/bootstrap.js"></script>
+</body>
+</html>

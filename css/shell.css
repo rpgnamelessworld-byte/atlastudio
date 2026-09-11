@@ -1,0 +1,415 @@
+/* Estrutura principal da aplicação para desktop e barra superior. */
+
+:root {
+  --ui-bg: #0d1217;
+  --ui-panel: #12191f;
+  --ui-panel-2: #161e25;
+  --ui-panel-3: #1b242c;
+  --ui-border: #303b44;
+  --ui-border-soft: #26323a;
+  --ui-text: #e7edf2;
+  --ui-muted: #8c9aa5;
+  --topbar-h: 64px;
+  --statusbar-h: 30px;
+  --inspector-w: 376px;
+}
+
+html,
+body {
+  background: var(--ui-bg);
+}
+
+body.app-shell {
+  display: grid;
+  grid-template-rows: var(--topbar-h) minmax(0, 1fr) var(--statusbar-h);
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  color: var(--ui-text);
+}
+
+.topbar {
+  position: relative;
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--ui-border);
+  background:
+    linear-gradient(180deg, #10171d 0%, #0c1116 100%);
+  box-shadow: 0 4px 15px rgba(0,0,0,.28);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 280px;
+  white-space: nowrap;
+  color: inherit;
+  text-decoration: none;
+}
+
+.brand-mark {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  color: #cfd7de;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.brand-mark svg {
+  width: 25px;
+  height: 25px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.brand-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+  letter-spacing: .02em;
+  color: #f0f2f3;
+}
+
+.topbar-map {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topbar select,
+.top-button,
+.top-mode-switch button {
+  height: 36px;
+  box-sizing: border-box;
+  border: 1px solid var(--ui-border);
+  border-radius: 6px;
+  background: #12191f;
+  color: var(--ui-text);
+  padding: 0 12px;
+  box-shadow: inset 0 1px rgba(255,255,255,.02);
+}
+
+a.top-button {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.topbar select {
+  min-width: 190px;
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.top-button:hover,
+.top-mode-switch button:hover {
+  border-color: #46545e;
+  background: #182129;
+}
+
+.top-mode-switch button.ativo {
+  border-color: rgba(37,214,118,.45);
+  color: #49e18d;
+  background: rgba(23,96,58,.14);
+}
+
+.top-spacer {
+  flex: 1;
+}
+
+/* Botões só-ícone (barra de cima e barra lateral): o rótulo vira
+   tooltip nativo (title) + texto acessível fora da tela. */
+.top-button.icon-only,
+.top-mode-switch button.icon-only {
+  width: 36px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  font-size: 17px;
+}
+
+.top-action-svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Oculta a atribuição do Leaflet na interface do mapa. */
+.leaflet-control-attribution {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.top-mode-switch {
+  display: flex;
+  grid-template-columns: none;
+  margin: 0;
+  gap: 7px;
+}
+
+.workspace {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--inspector-w);
+  background: #090d11;
+}
+
+.rail-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.map-stage {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: #0b1014;
+}
+
+#mapa {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  background: #0b1014;
+}
+
+.inspector {
+  position: relative !important;
+  top: auto !important;
+  right: auto !important;
+  z-index: 1200;
+  display: block !important;
+  width: auto !important;
+  max-width: none !important;
+  max-height: none !important;
+  height: auto;
+  box-sizing: border-box;
+  padding: 0 !important;
+  overflow-y: auto;
+  border-radius: 0 !important;
+  border-left: 1px solid var(--ui-border);
+  background: #11181e !important;
+  box-shadow: -5px 0 18px rgba(0,0,0,.18) !important;
+}
+
+.inspector:not(.aberto) {
+  display: none !important;
+}
+
+.inspector-titlebar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  height: 42px;
+  box-sizing: border-box;
+  padding: 0 11px;
+  margin: 0 !important;
+  border-bottom: 1px solid var(--ui-border);
+  background: #151d24;
+}
+
+.inspector-titlebar strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+}
+
+.inspector-section {
+  padding: 8px;
+}
+
+.section-card {
+  border: 1px solid var(--ui-border);
+  border-radius: 6px;
+  overflow: hidden;
+  background: #121a20;
+}
+
+.section-card-title {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--ui-border);
+  background: #151e25;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 700;
+}
+
+.status {
+  border: 1px solid #263641;
+  background: #0f171d;
+  color: #9fb2bf;
+}
+
+.campo label,
+.subtitulo {
+  color: #aeb9c0;
+}
+
+.campo input,
+.campo select,
+.campo textarea,
+.grupo-opcoes input,
+.grupo-opcoes select {
+  background: #0d1419 !important;
+  border-color: #394650 !important;
+  color: #e6edf2 !important;
+}
+
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+  outline: 1px solid #1685cf;
+  border-color: #1685cf !important;
+}
+
+.grupo-referencia,
+.controle-vertice,
+.grupo-opcoes,
+.lista-relacoes {
+  border-color: var(--ui-border) !important;
+  background: #10171d !important;
+}
+
+.portal-config {
+  border-color: rgba(155,115,255,.42) !important;
+  background: rgba(84,57,130,.09) !important;
+}
+
+.statusbar {
+  position: relative;
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 0 16px;
+  border-top: 1px solid var(--ui-border);
+  background: #0c1217;
+  color: #b7c2ca;
+  font-size: 11px;
+}
+
+.statusbar strong {
+  color: #4ebdff;
+  font-weight: 500;
+}
+
+.status-divider {
+  width: 1px;
+  height: 15px;
+  background: #3a444c;
+}
+
+.status-spacer {
+  flex: 1;
+}
+
+/* Refinos visuais do Leaflet. */
+.leaflet-control-zoom {
+  border: 1px solid #26343d !important;
+  box-shadow: 0 3px 10px rgba(0,0,0,.28) !important;
+}
+
+.leaflet-control-zoom a {
+  background: rgba(15,22,28,.92) !important;
+  color: #dce4ea !important;
+  border-color: #26343d !important;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: #f6f7f8;
+  color: #252d33;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 7px;
+  box-shadow: 0 7px 24px rgba(0,0,0,.35);
+}
+
+.marcador-icone {
+  filter:
+    drop-shadow(0 1px 1px rgba(0,0,0,.95))
+    drop-shadow(0 0 4px rgba(0,0,0,.78));
+}
+
+/* O mapa ocupa o espaço liberado quando o Inspector está fechado. */
+body.painel-fechado .workspace {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+body.painel-fechado .inspector {
+  display: none !important;
+}
+
+@media (max-width: 1250px) {
+  :root {
+    --inspector-w: 340px;
+  }
+
+  .brand {
+    min-width: 220px;
+  }
+
+  .brand-title {
+    font-size: 17px;
+  }
+
+  .top-button {
+    padding: 0 8px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 980px) {
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .inspector {
+    position: absolute !important;
+    right: 0 !important;
+    top: var(--topbar-h) !important;
+    bottom: var(--statusbar-h) !important;
+    width: min(390px, 88vw) !important;
+  }
+
+  .top-actions .top-button:nth-child(2),
+  .top-actions .top-button:nth-child(3) {
+    display: none;
+  }
+
+  .brand-title {
+    display: none;
+  }
+
+  .brand {
+    min-width: auto;
+  }
+}

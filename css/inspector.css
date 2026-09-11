@@ -1,0 +1,287 @@
+/* Inspector contextual, seus estados e controles de edição. */
+:root{--inspector-accent:#16d7ec;--inspector-border:rgba(255,255,255,.10);}
+.inspector-title-copy{display:flex;flex-direction:column;gap:1px}.inspector-subtitle{font-size:8px;color:#72808d;text-transform:uppercase;letter-spacing:.08em}
+.inspector-tabs{display:grid;grid-template-columns:repeat(4,1fr);margin:0 -14px 10px;border-top:1px solid var(--inspector-border);border-bottom:1px solid var(--inspector-border)}
+.inspector-tab{min-height:55px;border:0;border-right:1px solid rgba(255,255,255,.05);border-radius:0;background:#171b1e;color:#929da7;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}.inspector-tab span{font-size:15px}.inspector-tab small{font-size:8px}.inspector-tab.ativo{color:var(--inspector-accent);background:#1d2226;box-shadow:inset 0 -2px 0 var(--inspector-accent)}
+.inspector-tab-panel[hidden]{display:none!important}.inspector-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}.inspector-section-head small{display:block;font-size:8px;letter-spacing:.09em;color:#74818c}.inspector-section-head strong{font-size:13px}
+.label-settings .campo,.label-settings .check-row{margin-left:9px;margin-right:9px}.segmented-control{display:grid;grid-template-columns:1fr 1fr;gap:4px}.segmented-control button{border:1px solid rgba(255,255,255,.10);border-radius:5px;background:rgba(255,255,255,.03);color:#91a0ac;padding:6px;font-size:9px}.segmented-control button.ativo{color:var(--inspector-accent);border-color:rgba(22,215,236,.35);background:rgba(22,215,236,.07)}.field-helper{display:block;margin:4px 9px 9px;color:#71808d;font-size:8px;line-height:1.4}
+/* O modo Visualização não exibe as abas de edição. */body.modo-visualizacao .inspector-tabs{display:none}
+@media(max-width:1100px){.type-creation-list{grid-template-columns:1fr}}
+
+
+/* ============================================================
+   EDIÇÃO CONCENTRADA NO INSPECTOR
+   ============================================================ */
+
+:root {
+  --inspector-width: 400px;
+}
+
+.workspace {
+  grid-template-columns:
+    minmax(0, 1fr)
+    var(--inspector-width)
+    !important;
+}
+
+.map-stage {
+  min-width: 0;
+}
+
+#painel.inspector {
+  position: relative !important;
+  inset: auto !important;
+  width: var(--inspector-width) !important;
+  max-width: none !important;
+  max-height: none !important;
+  height: 100% !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column;
+  border-left: 1px solid var(--inspector-border);
+  background: #121619 !important;
+}
+
+body.painel-fechado .workspace {
+  grid-template-columns:
+    minmax(0, 1fr)
+    !important;
+}
+
+body.painel-fechado #painel.inspector {
+  display: none !important;
+}
+
+#painel .inspector-titlebar {
+  flex: 0 0 auto;
+  margin: 0 !important;
+  padding: 0 12px;
+  min-height: 48px;
+  border-bottom: 1px solid var(--inspector-border);
+}
+
+#painel .inspector-tabs {
+  flex: 0 0 auto;
+  margin: 0 !important;
+}
+
+#painelEdicao {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden !important;
+  display: flex;
+  flex-direction: column;
+}
+
+#painelEdicao[hidden] {
+  display: none !important;
+}
+
+#status {
+  flex: 0 0 auto;
+  margin: 9px 10px 0;
+}
+
+.inspector-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.inspector-tab-panel {
+  min-height: 0;
+}
+
+.inspector-actionbar {
+  flex: 0 0 auto;
+  min-height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--inspector-border);
+  background: #101417;
+  box-shadow: 0 -6px 18px rgba(0,0,0,.20);
+}
+
+.inspector-action-left,
+.inspector-action-right {
+  display: flex;
+  gap: 6px;
+}
+
+.inspector-action-button {
+  min-height: 34px !important;
+  width: auto !important;
+  display: inline-flex !important;
+  flex-direction: row !important;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 10px !important;
+  border: 1px solid rgba(255,255,255,.11) !important;
+  border-radius: 6px !important;
+  background: rgba(255,255,255,.035) !important;
+  color: #b7c1ca !important;
+}
+
+.inspector-action-button:disabled {
+  opacity: .28 !important;
+  cursor: default !important;
+}
+
+.inspector-action-button.action-save:not(:disabled) {
+  color: #4ae68e !important;
+  border-color: rgba(74,230,142,.38) !important;
+  background: rgba(74,230,142,.07) !important;
+}
+
+.inspector-action-button.action-danger:not(:disabled) {
+  color: #ff858b !important;
+  border-color: rgba(255,90,98,.30) !important;
+}
+
+.type-creation-list {
+  grid-template-columns: 1fr !important;
+}
+
+body.modo-visualizacao .inspector-actionbar {
+  display: none !important;
+}
+
+@media (max-width: 1100px) {
+  :root {
+    --inspector-width: 340px;
+  }
+}
+
+
+/* Os controles de vértice são representados pelas ações do Inspector. */
+#controleVertice {
+  display: none !important;
+}
+
+
+/* ============================================================
+   AJUSTES DE USABILIDADE
+   ============================================================ */
+
+/* Mensagem apresentada quando ainda não existem Tipos. */
+.types-empty-state {
+  padding: 12px;
+  border: 1px dashed rgba(255,255,255,.10);
+  border-radius: 7px;
+  color: #7e8b96;
+  text-align: center;
+  font-size: 10px;
+}
+
+/* A barra de ações some completamente quando não há sessão ativa. */
+.inspector-actionbar[hidden] {
+  display: none !important;
+}
+
+/* Camadas = apenas objetos que existem no mapa. */
+.layer-group {
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 7px;
+  background: rgba(255,255,255,.02);
+  overflow: hidden;
+}
+
+.layer-group + .layer-group {
+  margin-top: 6px;
+}
+
+.layer-group-summary {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 7px;
+  align-items: center;
+  padding: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.layer-group-summary input,
+.layer-item input {
+  accent-color: var(--inspector-accent, #16d7ec);
+}
+
+.layer-title strong {
+  display: block;
+  font-size: 11px;
+}
+
+.layer-title small {
+  display: block;
+  margin-top: 2px;
+  color: #71808c;
+  font-size: 8px;
+}
+
+.layer-items {
+  display: grid;
+  gap: 1px;
+  padding: 4px 7px 7px 29px;
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+
+.layer-item {
+  display: grid;
+  grid-template-columns: 20px minmax(0,1fr);
+  gap: 6px;
+  align-items: center;
+  padding: 5px 4px;
+  border-radius: 5px;
+  color: #aeb9c3;
+  font-size: 10px;
+}
+
+.layer-item:hover {
+  background: rgba(255,255,255,.035);
+}
+
+/* Posição do título: duas opções claras e largas. */
+.label-settings .segmented-control {
+  grid-template-columns: 1fr;
+}
+
+.label-settings .segmented-control button {
+  text-align: left;
+  padding: 8px 9px;
+}
+
+.label-settings .segmented-control.label-size-mode {
+  grid-template-columns: 1fr 1fr;
+}
+
+.label-settings .segmented-control.label-size-mode button {
+  text-align: center;
+}
+
+.label-settings #labelSize:disabled {
+  opacity: .52;
+  cursor: not-allowed;
+}
+
+/* Relação automática de linha. */
+.line-relation-fields {
+  border-color: rgba(22,215,236,.18);
+}
+
+/* Em telas estreitas o Inspector ainda domina a edição sem esmagar o mapa. */
+@media (max-width: 1100px) {
+  .layer-items {
+    padding-left: 18px;
+  }
+}
+
+/* Garante que o atributo hidden prevaleça sobre regras de layout. */
+[hidden] {
+  display: none !important;
+}
