@@ -24,4 +24,3 @@ A página de Administração permite cadastrar usuários e políticas locais, ma
 
 - [Guia de uso](docs/user-guide.md): criação, edição, consulta e backups.
 - [Guia técnico](docs/development.md): estrutura do código, regras de manutenção e testes.
-# atlastudio
